@@ -31,6 +31,72 @@ export default function HomeTab({
 
   return (
     <div style={{ paddingBottom: 80 }}>
+      {/* 히어로 섹션 — 첫 방문자용 앱 소개 */}
+      <div
+        style={{
+          background: `linear-gradient(135deg, ${colors.navy} 0%, #2D3748 100%)`,
+          padding: '28px 20px 24px',
+          marginBottom: 16,
+          color: colors.white,
+        }}
+      >
+        <p style={{ fontSize: fontSize.sm, color: 'rgba(255,255,255,0.5)', marginBottom: 6, fontWeight: fontWeight.medium }}>
+          자격증 학원 비교 플랫폼
+        </p>
+        <h1
+          style={{
+            fontSize: fontSize['3xl'],
+            fontWeight: fontWeight.extrabold,
+            lineHeight: 1.35,
+            letterSpacing: -0.5,
+            marginBottom: 10,
+          }}
+        >
+          자격증, 따고 싶은데<br />
+          어디서부터 시작하지?
+        </h1>
+        <p style={{ fontSize: fontSize.base, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5, marginBottom: 20 }}>
+          내일배움카드로 무료 수강 가능한 학원을<br />
+          한눈에 비교하고, 나에게 맞는 자격증을 찾아보세요.
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={() => router.push('/test')}
+            className="press"
+            style={{
+              flex: 1,
+              padding: '13px 0',
+              borderRadius: radius.lg,
+              border: 'none',
+              background: colors['orange-40'],
+              fontSize: fontSize.base,
+              fontWeight: fontWeight.bold,
+              color: colors.white,
+              cursor: 'pointer',
+            }}
+          >
+            나에게 맞는 자격증 찾기
+          </button>
+          <button
+            onClick={() => onTabChange?.('search')}
+            className="press"
+            style={{
+              flex: 1,
+              padding: '13px 0',
+              borderRadius: radius.lg,
+              border: '1px solid rgba(255,255,255,0.25)',
+              background: 'rgba(255,255,255,0.08)',
+              fontSize: fontSize.base,
+              fontWeight: fontWeight.semibold,
+              color: colors.white,
+              cursor: 'pointer',
+            }}
+          >
+            학원 둘러보기
+          </button>
+        </div>
+      </div>
+
       {/* Search Bar (클릭 시 오버레이 오픈) */}
       <div style={{ padding: '0 20px 16px' }}>
         <div
