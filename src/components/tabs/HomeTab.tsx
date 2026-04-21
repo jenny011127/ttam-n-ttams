@@ -1,8 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Search, ChevronRight, Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket, Shield, TrendingUp, Award, FileText, ThumbsUp, ClipboardList } from 'lucide-react';
+import { useEffect } from 'react';
+import { Search, ChevronRight, Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket, Shield, FileText, ThumbsUp, ClipboardList } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius, spacing, shadows } from '@/lib/design-tokens';
+import { trackEvent } from '@/lib/track';
 import { categories } from '@/lib/categories';
 import { getTopAcademies, allReviews, getGovernmentFundedAcademies } from '@/lib/data';
 import { getAvailableExamCategories } from '@/lib/data/mock-exams';
@@ -25,6 +27,7 @@ export default function HomeTab({
   onTabChange?: (tab: string) => void;
 }) {
   const router = useRouter();
+  useEffect(() => { trackEvent('page_view', { page: '/' }); }, []);
   const topAcademies = getTopAcademies(8);
   const govAcademies = getGovernmentFundedAcademies().slice(0, 6);
   const recentReviews = [...allReviews].sort((a, b) => b.helpfulCount - a.helpfulCount).slice(0, 4);
@@ -117,61 +120,6 @@ export default function HomeTab({
           <span style={{ fontSize: fontSize.md, color: colors['gray-40'] }}>
             관심 자격증을 검색해보세요
           </span>
-        </div>
-      </div>
-
-      {/* 자격증 적성 테스트 배너 (메인 CTA) */}
-      <div style={{ padding: '0 20px 20px' }}>
-        <div
-          className="press"
-          onClick={() => router.push('/test')}
-          style={{
-            background: 'linear-gradient(135deg, #F9502E 0%, #E81B0E 100%)',
-            borderRadius: radius.lg,
-            padding: '22px 20px 20px',
-            color: colors.white,
-            position: 'relative',
-            overflow: 'hidden',
-            cursor: 'pointer',
-          }}
-        >
-          {/* 배경 장식 */}
-          <div style={{ position: 'absolute', right: 16, top: 16, opacity: 0.12 }}>
-            <Award size={80} strokeWidth={1} />
-          </div>
-          <div style={{ position: 'absolute', right: 70, bottom: 12, opacity: 0.08 }}>
-            <Sparkles size={40} />
-          </div>
-
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              background: 'rgba(255,255,255,0.2)', borderRadius: radius.full,
-              padding: '4px 10px', fontSize: fontSize.xs, fontWeight: fontWeight.semibold,
-              marginBottom: 12, backdropFilter: 'blur(4px)',
-            }}>
-              <TrendingUp size={12} /> 12,847명 참여
-            </div>
-
-            <h2 style={{ fontSize: fontSize['3xl'], fontWeight: fontWeight.extrabold, lineHeight: 1.3, marginBottom: 6, letterSpacing: -0.5 }}>
-              어떤 자격증이<br />나한테 맞을까?
-            </h2>
-            <p style={{ fontSize: fontSize.sm, color: 'rgba(255,255,255,0.75)', marginBottom: 16, lineHeight: 1.5 }}>
-              1분이면 충분해요.<br />딱 맞는 자격증을 추천해드릴게요.
-            </p>
-
-            <div
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                background: colors.white, color: colors['orange-50'],
-                fontSize: fontSize.base, fontWeight: fontWeight.bold,
-                padding: '11px 22px', borderRadius: radius.full,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              }}
-            >
-              테스트 시작 <ChevronRight size={16} />
-            </div>
-          </div>
         </div>
       </div>
 

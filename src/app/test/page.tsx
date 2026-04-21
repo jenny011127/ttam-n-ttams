@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { questions, type Answers } from '@/lib/data/aptitude-test';
+import { trackEvent } from '@/lib/track';
 
 export default function TestPage() {
   const router = useRouter();
+  useEffect(() => { trackEvent('test_start', { page: '/test' }); }, []);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [animDir, setAnimDir] = useState<'enter' | 'exit' | null>(null);

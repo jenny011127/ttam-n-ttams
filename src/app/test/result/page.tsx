@@ -1,13 +1,14 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { ArrowLeft, ChevronRight, MapPin, Trophy, Medal, Award, RotateCcw, Check, Lock, User, Phone } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius, shadows } from '@/lib/design-tokens';
 import { calculateResults, resultCopy, type Answers } from '@/lib/data/aptitude-test';
 import { categories } from '@/lib/categories';
 import { allAcademies } from '@/lib/data';
 import { supabase } from '@/lib/supabase';
+import { trackEvent } from '@/lib/track';
 
 // 지역 매핑 (answers.region → addressShort 키워드)
 const regionKeywords: Record<string, string[]> = {
@@ -239,6 +240,10 @@ function ResultContent() {
   const regionKeys = regionKeywords[userRegion] || [];
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [gateCleared, setGateCleared] = useState(false);
+
+  useEffect(() => {
+    trackEvent('test_complete', { page: '/test/result', eventData: { topCategory: top3[0]?.categoryId } });
+  }, []);
 
   function getFilteredAcademies(categoryId: string) {
     const catAcademies = allAcademies.filter((a) => a.categoryId === categoryId);
