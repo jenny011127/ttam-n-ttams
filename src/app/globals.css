@@ -1,26 +1,247 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: 'memomentKkukKkuk';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2508-2@1.0/memomentKkukKkuk.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: #FFFFFF;
+  --color-card: #FFFFFF;
+  --color-navy: #1B202C;
+  --color-black: #1D1D1D;
+  --color-orange-60: #E81B0E;
+  --color-orange-50: #F73418;
+  --color-orange-40: #F9502E;
+  --color-orange-30: #FC9475;
+  --color-orange-20: #FDC0AB;
+  --color-orange-10: #FFE1D5;
+  --color-gray-90: #5A5E66;
+  --color-gray-60: #AEB3BC;
+  --color-gray-40: #C5C8CE;
+  --color-gray-30: #D9DEE5;
+  --color-gray-20: #E5E7EB;
+  --color-gray-10: #F2F4F7;
+  --color-gray-05: #F8F9FA;
+  --color-government: #3B82F6;
+  --color-success: #10B981;
+  --color-star: #FBBF24;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #FFFFFF; }
+@media (min-width: 768px) {
+  html { background: #F2F4F7; }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #FFFFFF;
+  color: #1D1D1D;
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.app-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #FFFFFF;
+  position: relative;
+}
+@media (min-width: 768px) {
+  .app-shell {
+    box-shadow: 0 0 60px rgba(0,0,0,0.06);
+  }
+}
+
+.bottom-nav {
+  /* positioning handled in inline styles */
+}
+
+/* Splash covers full screen */
+.splash {
+  width: 100% !important;
+  max-width: none !important;
+  left: 0 !important;
+  transform: none !important;
+}
+.splash-exit {
+  animation: splashOut 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  width: 100% !important;
+  max-width: none !important;
+  left: 0 !important;
+  transform: none !important;
+}
+
+* { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display: none; }
+
+.press { cursor: pointer; }
+
+.tab-btn { cursor: pointer; }
+.tab-btn.pop { animation: tabHeartbeat 300ms ease-in-out; }
+@keyframes tabHeartbeat {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.2); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.hscroll {
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.hscroll::-webkit-scrollbar { display: none; }
+.hscroll > * { scroll-snap-align: start; }
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(27,32,44,0.04), 0 8px 24px rgba(27,32,44,0.03);
+}
+
+@keyframes floatPulse {
+  0%, 100% { transform: translateY(0); box-shadow: 0 4px 16px rgba(249,80,46,0.35); }
+  50% { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(249,80,46,0.45); }
+}
+.float-pulse {
+  animation: floatPulse 2.5s ease-in-out infinite;
+}
+
+/* ─── Splash Screen ─── */
+.splash-glow {
+  position: absolute;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: splashGlowPulse 2s ease-in-out infinite;
+}
+@keyframes splashGlowPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.splash-logo {
+  opacity: 0;
+  transform: scale(0.5);
+  animation: splashLogoIn 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes splashLogoIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
+.splash-title {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: splashFadeUp 500ms 300ms ease-out forwards;
+}
+
+.splash-tagline {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+.splash-tagline-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.splash-exit {
+  animation: splashOut 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes splashOut {
+  to { opacity: 0; transform: scale(1.05); }
+}
+
+@keyframes splashFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Main App Entry ─── */
+.app-shell-enter {
+  animation: appEnter 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes appEnter {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Tab Content Transition ─── */
+.tab-content {
+  animation: tabFadeIn 300ms ease-out;
+}
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Bottom Nav Motions ─── */
+.bottom-nav { position: relative; }
+
+.tab-btn {
+  cursor: pointer;
+  position: relative;
+  transition: transform 120ms ease;
+}
+.tab-btn:active {
+  transform: scale(0.9);
+}
+
+.tab-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tab-icon-wrap.active {
+  transform: scale(1.1) translateY(-1px);
+}
+
+.tab-label {
+  transition: color 200ms ease, font-weight 200ms ease, transform 200ms ease;
+}
+.tab-label.active {
+  transform: translateY(-1px);
+}
+
+.tab-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #F9502E;
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  margin-left: -2px;
+  opacity: 0;
+  transform: scale(0);
+  transition: opacity 250ms ease, transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tab-dot.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Nav active indicator bar */
+.nav-indicator {
+  position: absolute;
+  top: -1px;
+  height: 2px;
+  width: 32px;
+  background: #F9502E;
+  border-radius: 0 0 2px 2px;
+  transition: left 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
