@@ -251,12 +251,14 @@ function ResultContent() {
 
   const handleGateSubmit = async (name: string, phone: string) => {
     try {
-      await supabase.from('leads').insert({
-        name,
-        phone,
-        test_answers: answers,
-        recommended_category: top3[0].categoryId,
-      });
+      if (supabase) {
+        await supabase.from('leads').insert({
+          name,
+          phone,
+          test_answers: answers,
+          recommended_category: top3[0].categoryId,
+        });
+      }
     } catch (e) {
       console.error('Lead save error:', e);
     }
