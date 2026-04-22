@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft, ChevronRight, Trophy, Medal, Award, MapPin,
-  Check, Lock, User, Phone, Sparkles, ArrowRight,
+  Check, User, Phone, Sparkles, ArrowRight,
 } from 'lucide-react';
 import { colors } from '@/lib/design-tokens';
 import { questions, calculateResults, resultCopy, type Answers } from '@/lib/data/aptitude-test';
@@ -18,6 +18,13 @@ const regionKeywords: Record<string, string[]> = {
   seoul: ['서울'], gyeonggi: ['경기', '인천'],
   busan: ['부산', '경남', '울산'], other: [],
 };
+
+const REGION_OPTIONS = [
+  { id: 'seoul', label: '서울' },
+  { id: 'gyeonggi', label: '경기/인천' },
+  { id: 'busan', label: '부산/경남' },
+  { id: 'other', label: '그 외 지역' },
+];
 
 const ROLLING_CERTS = [
   '용접기능사', '전기기능사', '배관기능사', '요양보호사',
@@ -39,7 +46,134 @@ const STEPS = [
   { num: '03', title: '집 근처 학원까지', desc: '국비지원 무료 수강 가능한 학원을 바로 확인' },
 ];
 
-type Step = 'intro' | 'test' | 'gate' | 'result';
+// 지역 질문은 collect에서 받으므로 테스트에서 제외
+const testQuestions = questions.filter(q => q.id !== 'region');
+
+// ─── 반응형 CSS ───
+const RESPONSIVE_CSS = `
+@keyframes worryScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Base (mobile) ── */
+.lp-page { width: 100%; min-height: 100vh; }
+.lp-intro { max-width: 100%; }
+.lp-form { max-width: 430px; margin: 0 auto; }
+.lp-result { max-width: 430px; margin: 0 auto; }
+
+.lp-hero { padding: 60px 24px 44px; }
+.lp-hero-inner { max-width: 600px; margin: 0 auto; }
+.lp-hero-title { font-size: 28px; }
+.lp-hero-desc { font-size: 15px; }
+.lp-hero-cta { max-width: 100%; margin: 0 auto; }
+.lp-hero-btn { font-size: 17px; padding: 16px 0; }
+
+.lp-section { padding: 44px 24px; }
+.lp-section-inner { max-width: 700px; margin: 0 auto; }
+.lp-worry-heading { font-size: 22px; }
+.lp-target-label { font-size: 13px; }
+.lp-target-heading { font-size: 24px; }
+.lp-target-desc { font-size: 15px; }
+.lp-worry-card { width: 160px; padding: 20px; }
+
+.lp-trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.lp-trust-value { font-size: 24px; }
+.lp-steps-list { display: flex; flex-direction: column; gap: 20px; }
+.lp-step-num { font-size: 18px; }
+.lp-step-title { font-size: 16px; }
+
+.lp-faq-section { padding: 44px 24px 120px; }
+.lp-faq-inner { max-width: 700px; margin: 0 auto; }
+.lp-faq-heading { font-size: 20px; }
+
+.lp-fixed-bar { max-width: 430px; width: 100%; }
+.lp-fixed-btn { font-size: 17px; padding: 16px 0; }
+
+.lp-test-pad { padding: 0 20px; }
+.lp-test-q { font-size: 24px; }
+.lp-test-opt { padding: 16px 18px; font-size: 16px; }
+
+.lp-collect-section { padding: 44px 24px 40px; }
+.lp-collect-title { font-size: 24px; }
+
+.lp-result-hero { padding: 32px 24px 28px; }
+.lp-result-name { font-size: 28px; }
+.lp-result-cards { padding: 20px 20px 0; }
+.lp-result-section-title { font-size: 20px; }
+.lp-result-card-name { font-size: 18px; }
+.lp-result-match { font-size: 22px; }
+.lp-result-bottom { padding: 16px 20px; }
+
+/* ── Tablet (768px+) ── */
+@media (min-width: 768px) {
+  .lp-form { max-width: 560px; }
+  .lp-result { max-width: 720px; }
+
+  .lp-hero { padding: 100px 40px 64px; }
+  .lp-hero-inner { max-width: 700px; }
+  .lp-hero-title { font-size: 44px; }
+  .lp-hero-desc { font-size: 18px; }
+  .lp-hero-cta { max-width: 420px; }
+  .lp-hero-btn { font-size: 18px; padding: 18px 0; }
+
+  .lp-section { padding: 64px 40px; }
+  .lp-worry-heading { font-size: 30px; }
+  .lp-target-label { font-size: 14px; }
+  .lp-target-heading { font-size: 30px; }
+  .lp-target-desc { font-size: 17px; }
+  .lp-worry-card { width: 220px; padding: 24px; }
+
+  .lp-trust-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .lp-trust-value { font-size: 28px; }
+  .lp-steps-list { flex-direction: row; gap: 32px; }
+  .lp-steps-list > div { flex: 1; }
+  .lp-step-num { font-size: 22px; }
+  .lp-step-title { font-size: 18px; }
+
+  .lp-faq-section { padding: 64px 40px 140px; }
+  .lp-faq-heading { font-size: 24px; }
+
+  .lp-fixed-bar { max-width: 560px; }
+  .lp-fixed-btn { font-size: 18px; padding: 18px 0; }
+
+  .lp-test-pad { padding: 0 40px; max-width: 600px; margin: 0 auto; }
+  .lp-test-q { font-size: 28px; }
+  .lp-test-opt { padding: 18px 22px; font-size: 17px; }
+
+  .lp-collect-section { padding: 52px 40px 48px; }
+  .lp-collect-title { font-size: 28px; }
+
+  .lp-result-hero { padding: 44px 40px 36px; }
+  .lp-result-name { font-size: 34px; }
+  .lp-result-cards { padding: 28px 32px 0; }
+  .lp-result-section-title { font-size: 24px; }
+  .lp-result-card-name { font-size: 20px; }
+  .lp-result-match { font-size: 26px; }
+  .lp-result-bottom { padding: 20px 32px; }
+}
+
+/* ── Desktop (1024px+) ── */
+@media (min-width: 1024px) {
+  .lp-hero { padding: 120px 40px 80px; }
+  .lp-hero-title { font-size: 52px; }
+  .lp-hero-desc { font-size: 20px; }
+
+  .lp-section { padding: 80px 40px; }
+  .lp-worry-heading { font-size: 36px; }
+  .lp-target-heading { font-size: 34px; }
+  .lp-target-desc { font-size: 18px; }
+  .lp-worry-card { width: 260px; padding: 28px; }
+  .lp-trust-value { font-size: 32px; }
+
+  .lp-faq-section { padding: 80px 40px 160px; }
+  .lp-faq-heading { font-size: 26px; }
+
+  .lp-collect-title { font-size: 30px; }
+}
+`;
+
+type Step = 'intro' | 'collect' | 'test' | 'result';
 
 function LandingContent() {
   const router = useRouter();
@@ -54,6 +188,13 @@ function LandingContent() {
   // 롤링 텍스트
   const [certIdx, setCertIdx] = useState(0);
   const [certFade, setCertFade] = useState(true);
+
+  // 리드 수집 (collect 단계)
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [region, setRegion] = useState('');
+  const [collectError, setCollectError] = useState('');
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     trackEvent('lp_view', { page: '/landing', eventData: { utm_source: utmSource } });
@@ -70,18 +211,52 @@ function LandingContent() {
     return () => clearInterval(timer);
   }, []);
 
-  const total = questions.length;
+  const total = testQuestions.length;
   const progress = step === 'test' ? ((currentQ) / total) * 100 : 0;
 
   const handleStart = () => {
     trackEvent('lp_test_start', { page: '/landing' });
+    setStep('collect');
+    window.scrollTo(0, 0);
+  };
+
+  // ─── Collect → DB 저장 후 테스트 시작 ───
+  const handleCollectSubmit = async () => {
+    if (!name.trim()) { setCollectError('이름을 입력해주세요'); return; }
+    if (!phone.trim() || phone.replace(/[^0-9]/g, '').length < 10) {
+      setCollectError('전화번호를 정확히 입력해주세요'); return;
+    }
+    if (!region) { setCollectError('지역을 선택해주세요'); return; }
+    setCollectError('');
+    setSaving(true);
+
+    // 지역을 answers에 미리 세팅
+    setAnswers(prev => ({ ...prev, region }));
+
+    try {
+      if (supabase) {
+        const params = new URLSearchParams(window.location.search);
+        await supabase.from('leads').insert({
+          name: name.trim(), phone: phone.trim(),
+          test_answers: { region },
+          recommended_category: null,
+          utm_source: params.get('utm_source') || null,
+          utm_medium: params.get('utm_medium') || null,
+          utm_campaign: params.get('utm_campaign') || null,
+        });
+      }
+    } catch (e) { console.error('Lead save error:', e); }
+
+    trackEvent('lp_collect_submit', { page: '/landing', eventData: { region } });
+    setSaving(false);
     setStep('test');
+    setCurrentQ(0);
     window.scrollTo(0, 0);
   };
 
   // ─── Test ───
   const handleSelect = useCallback((optionId: string) => {
-    const question = questions[currentQ];
+    const question = testQuestions[currentQ];
     const newAnswers = { ...answers, [question.id]: optionId };
     setAnswers(newAnswers);
 
@@ -93,7 +268,9 @@ function LandingContent() {
         setTimeout(() => setAnimDir(null), 300);
       }, 200);
     } else {
-      setStep('gate');
+      // 테스트 완료 → 바로 결과
+      trackEvent('lp_test_complete', { page: '/landing', eventData: { answers: newAnswers } });
+      setStep('result');
       window.scrollTo(0, 0);
     }
   }, [currentQ, total, answers]);
@@ -107,49 +284,15 @@ function LandingContent() {
         setTimeout(() => setAnimDir(null), 300);
       }, 200);
     } else {
-      setStep('intro');
+      setStep('collect');
     }
   };
-
-  // ─── Gate ───
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const results = calculateResults(answers);
   const top3 = results.slice(0, 3);
   const userRegion = answers.region || 'other';
   const regionKeys = regionKeywords[userRegion] || [];
   const [selectedIdx, setSelectedIdx] = useState(0);
-
-  const handleGateSubmit = async () => {
-    if (!name.trim()) { setError('이름을 입력해주세요'); return; }
-    if (!phone.trim() || phone.replace(/[^0-9]/g, '').length < 10) {
-      setError('전화번호를 정확히 입력해주세요'); return;
-    }
-    setError('');
-    setLoading(true);
-
-    try {
-      if (supabase) {
-        const params = new URLSearchParams(window.location.search);
-        await supabase.from('leads').insert({
-          name: name.trim(), phone: phone.trim(),
-          test_answers: answers,
-          recommended_category: top3[0]?.categoryId,
-          utm_source: params.get('utm_source') || null,
-          utm_medium: params.get('utm_medium') || null,
-          utm_campaign: params.get('utm_campaign') || null,
-        });
-      }
-    } catch (e) { console.error('Lead save error:', e); }
-
-    trackEvent('lp_test_complete', { page: '/landing', eventData: { topCategory: top3[0]?.categoryId } });
-    setStep('result');
-    setLoading(false);
-    window.scrollTo(0, 0);
-  };
 
   function getFilteredAcademies(categoryId: string) {
     const catAcademies = allAcademies.filter(a => a.categoryId === categoryId);
@@ -159,28 +302,22 @@ function LandingContent() {
   }
 
   // ════════════════════════════════════════
-  // STEP: INTRO — face.da-sh.io 스타일
+  // STEP: INTRO
   // ════════════════════════════════════════
   if (step === 'intro') {
     return (
-      <div style={{ minHeight: '100vh', background: '#fff', color: '#141517', maxWidth: 430, margin: '0 auto' }}>
+      <div className="lp-page lp-intro" style={{ background: '#fff', color: '#141517' }}>
+        <style>{RESPONSIVE_CSS}</style>
 
         {/* ─── 히어로 ─── */}
-        <section style={{
-          padding: '60px 24px 44px',
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          {/* 배경 그라데이션 */}
+        <section className="lp-hero" style={{ textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{
             position: 'absolute', inset: 0,
             background: `linear-gradient(180deg, ${colors['orange-40']}10 0%, ${colors['orange-40']}04 60%, transparent 100%)`,
             pointerEvents: 'none',
           }} />
 
-          <div style={{ position: 'relative' }}>
-            {/* 뱃지 */}
+          <div className="lp-hero-inner" style={{ position: 'relative' }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               background: `${colors['orange-40']}12`,
@@ -191,9 +328,8 @@ function LandingContent() {
               무료 · 1분 소요 · 10개 질문
             </div>
 
-            <h1 style={{
-              fontSize: 28, fontWeight: 900, lineHeight: 1.4,
-              letterSpacing: -0.5, marginBottom: 6,
+            <h1 className="lp-hero-title" style={{
+              fontWeight: 900, lineHeight: 1.4, letterSpacing: -0.5, marginBottom: 6, color: '#141517',
             }}>
               나에게 맞는 자격증은<br />
               <span style={{
@@ -208,46 +344,39 @@ function LandingContent() {
               ?
             </h1>
 
-            <p style={{
-              fontSize: 15, color: '#727883', lineHeight: 1.6,
-              marginBottom: 32,
-            }}>
+            <p className="lp-hero-desc" style={{ color: '#727883', lineHeight: 1.6 }}>
               체력, 성격, 목표에 맞춰 분석해서<br />
               딱 맞는 자격증 + 집 근처 학원까지 알려드려요.
             </p>
 
-            <button
-              onClick={handleStart}
-              className="press"
-              style={{
-                width: '100%', padding: '16px 0',
-                borderRadius: 16, border: 'none',
-                background: colors['orange-40'],
-                fontSize: 17, fontWeight: 700,
-                color: '#fff', cursor: 'pointer',
-                boxShadow: `0 8px 24px ${colors['orange-40']}30`,
-              }}
-            >
-              무료로 테스트 시작하기
-            </button>
+            <div className="lp-hero-cta">
+              <button
+                onClick={handleStart}
+                className="press lp-hero-btn"
+                style={{
+                  width: '100%',
+                  borderRadius: 16, border: 'none',
+                  background: colors['orange-40'],
+                  fontWeight: 700,
+                  color: '#fff', cursor: 'pointer',
+                  boxShadow: `0 8px 24px ${colors['orange-40']}30`,
+                }}
+              >
+                무료로 테스트 시작하기
+              </button>
+            </div>
           </div>
         </section>
 
         {/* ─── 고민 카드 (자동 스크롤) ─── */}
         <section style={{ padding: '40px 0 44px', background: '#fff' }}>
-          <h2 style={{
-            fontSize: 22, fontWeight: 900, textAlign: 'center',
+          <h2 className="lp-worry-heading" style={{
+            fontWeight: 900, textAlign: 'center',
             marginBottom: 24, padding: '0 24px', lineHeight: 1.4,
           }}>
             자격증, 학원..<br />이런 고민 하고 있다면
           </h2>
 
-          <style>{`
-            @keyframes worryScroll {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-          `}</style>
           <div style={{ overflow: 'hidden' }}>
             <div style={{
               display: 'flex', gap: 10,
@@ -255,9 +384,9 @@ function LandingContent() {
               width: 'max-content',
             }}>
               {[...WORRIES, ...WORRIES].map((w, i) => (
-                <div key={i} style={{
-                  flexShrink: 0, width: 160,
-                  borderRadius: 16, padding: 20,
+                <div key={i} className="lp-worry-card" style={{
+                  flexShrink: 0,
+                  borderRadius: 16,
                   background: '#F3F4F6',
                 }}>
                   <p style={{
@@ -274,103 +403,106 @@ function LandingContent() {
         </section>
 
         {/* ─── 이런 분을 위해 ─── */}
-        <section style={{ padding: '44px 24px', background: '#F8F9FA' }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: colors['orange-40'], marginBottom: 10 }}>
-            이런 분을 위해 만들었어요
-          </p>
-          <h2 style={{ fontSize: 24, fontWeight: 900, lineHeight: 1.4, marginBottom: 8 }}>
-            어디서부터 시작할지<br />모르겠다면,
-          </h2>
-          <p style={{ fontSize: 15, color: '#727883', lineHeight: 1.6, marginBottom: 28 }}>
-            10개 질문이면 충분해요.<br />
-            나에게 맞는 자격증, 예상 월급, 추천 학원까지<br />
-            한 번에 정리해드립니다.
-          </p>
+        <section className="lp-section" style={{ background: '#F8F9FA' }}>
+          <div className="lp-section-inner">
+            <p className="lp-target-label" style={{ fontWeight: 700, color: colors['orange-40'], marginBottom: 10 }}>
+              이런 분을 위해 만들었어요
+            </p>
+            <h2 className="lp-target-heading" style={{ fontWeight: 900, lineHeight: 1.4, marginBottom: 8, color: '#141517' }}>
+              어디서부터 시작할지<br />모르겠다면,
+            </h2>
+            <p className="lp-target-desc" style={{ color: '#727883', lineHeight: 1.6, marginBottom: 28 }}>
+              10개 질문이면 충분해요.<br />
+              나에게 맞는 자격증, 예상 월급, 추천 학원까지<br />
+              한 번에 정리해드립니다.
+            </p>
 
-          {/* 3단계 프로세스 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {STEPS.map((s) => (
-              <div key={s.num} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                <span style={{
-                  fontSize: 18, fontWeight: 900, color: colors['orange-40'],
-                  flexShrink: 0, minWidth: 28,
-                }}>
-                  {s.num}
-                </span>
-                <div>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: '#141517', marginBottom: 4 }}>
-                    {s.title}
-                  </p>
-                  <p style={{ fontSize: 14, color: '#727883', lineHeight: 1.5 }}>
-                    {s.desc}
-                  </p>
+            <div className="lp-steps-list">
+              {STEPS.map((s) => (
+                <div key={s.num} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                  <span className="lp-step-num" style={{
+                    fontWeight: 900, color: colors['orange-40'],
+                    flexShrink: 0, minWidth: 28,
+                  }}>
+                    {s.num}
+                  </span>
+                  <div>
+                    <p className="lp-step-title" style={{ fontWeight: 700, color: '#141517', marginBottom: 4 }}>
+                      {s.title}
+                    </p>
+                    <p style={{ fontSize: 14, color: '#727883', lineHeight: 1.5 }}>
+                      {s.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
         {/* ─── 신뢰 요소 ─── */}
-        <section style={{ padding: '44px 24px', background: '#fff' }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12,
-          }}>
-            {[
-              { label: '테스트 비용', value: '무료', sub: '회원가입도 필요 없어요' },
-              { label: '소요 시간', value: '약 1분', sub: '10개 질문이면 끝' },
-              { label: '추천 자격증', value: 'TOP 3', sub: '적합도 %까지 분석' },
-              { label: '학원 추천', value: '지역별', sub: '국비지원 학원 포함' },
-            ].map((item, i) => (
-              <div key={i} style={{
-                padding: '20px 16px',
-                background: '#F8F9FA',
-                borderRadius: 16,
-                textAlign: 'center',
-              }}>
-                <p style={{ fontSize: 12, color: '#B2B8C0', fontWeight: 600, marginBottom: 6 }}>
-                  {item.label}
-                </p>
-                <p style={{ fontSize: 24, fontWeight: 900, color: '#141517', marginBottom: 4 }}>
-                  {item.value}
-                </p>
-                <p style={{ fontSize: 12, color: '#727883' }}>
-                  {item.sub}
-                </p>
-              </div>
-            ))}
+        <section className="lp-section" style={{ background: '#fff' }}>
+          <div className="lp-section-inner">
+            <div className="lp-trust-grid">
+              {[
+                { label: '테스트 비용', value: '무료', sub: '회원가입도 필요 없어요' },
+                { label: '소요 시간', value: '약 1분', sub: '10개 질문이면 끝' },
+                { label: '추천 자격증', value: 'TOP 3', sub: '적합도 %까지 분석' },
+                { label: '학원 추천', value: '지역별', sub: '국비지원 학원 포함' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  padding: '20px 16px',
+                  background: '#F8F9FA',
+                  borderRadius: 16,
+                  textAlign: 'center',
+                }}>
+                  <p style={{ fontSize: 12, color: '#B2B8C0', fontWeight: 600, marginBottom: 6 }}>
+                    {item.label}
+                  </p>
+                  <p className="lp-trust-value" style={{ fontWeight: 900, color: '#141517', marginBottom: 4 }}>
+                    {item.value}
+                  </p>
+                  <p style={{ fontSize: 12, color: '#727883' }}>
+                    {item.sub}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* ─── FAQ ─── */}
-        <section style={{ padding: '44px 24px 120px', background: '#fff' }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 20 }}>
-            자주 묻는 질문
-          </h2>
-          {[
-            { q: '정말 무료인가요?', a: '네, 완전 무료입니다. 회원가입도 필요 없어요.' },
-            { q: '결과는 얼마나 정확한가요?', a: '체력, 손재주, 위험환경 수용도, 목표 월급 등 10가지 요소를 분석해서 12개 자격증 중 가장 잘 맞는 걸 추천해요.' },
-            { q: '내일배움카드로 무료 수강 가능한가요?', a: '추천 학원 중 국비지원 학원이 표시되어 있어요. 내일배움카드 대상자라면 자부담 없이 수강할 수 있어요.' },
-            { q: '개인정보는 안전한가요?', a: '결과 확인을 위해 입력하신 정보는 맞춤 학원 안내 목적으로만 사용되며, 외부에 절대 제공하지 않습니다.' },
-          ].map((item, i) => (
-            <FaqItem key={i} q={item.q} a={item.a} />
-          ))}
+        <section className="lp-faq-section" style={{ background: '#fff' }}>
+          <div className="lp-faq-inner">
+            <h2 className="lp-faq-heading" style={{ fontWeight: 900, marginBottom: 20, color: '#141517' }}>
+              자주 묻는 질문
+            </h2>
+            {[
+              { q: '정말 무료인가요?', a: '네, 완전 무료입니다. 회원가입도 필요 없어요.' },
+              { q: '결과는 얼마나 정확한가요?', a: '체력, 손재주, 위험환경 수용도, 목표 월급 등 10가지 요소를 분석해서 12개 자격증 중 가장 잘 맞는 걸 추천해요.' },
+              { q: '내일배움카드로 무료 수강 가능한가요?', a: '추천 학원 중 국비지원 학원이 표시되어 있어요. 내일배움카드 대상자라면 자부담 없이 수강할 수 있어요.' },
+              { q: '개인정보는 안전한가요?', a: '결과 확인을 위해 입력하신 정보는 맞춤 학원 안내 목적으로만 사용되며, 외부에 절대 제공하지 않습니다.' },
+            ].map((item, i) => (
+              <FaqItem key={i} q={item.q} a={item.a} />
+            ))}
+          </div>
         </section>
 
         {/* ─── 하단 고정 CTA ─── */}
-        <div style={{
+        <div className="lp-fixed-bar" style={{
           position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-          maxWidth: 430, width: '100%', padding: '12px 20px',
+          padding: '12px 20px',
           paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
           background: 'linear-gradient(transparent, #fff 30%)',
         }}>
           <button
             onClick={handleStart}
-            className="press"
+            className="press lp-fixed-btn"
             style={{
-              width: '100%', padding: '16px 0',
+              width: '100%',
               borderRadius: 16, border: 'none',
               background: colors['orange-40'],
-              fontSize: 17, fontWeight: 700,
+              fontWeight: 700,
               color: '#fff', cursor: 'pointer',
               boxShadow: `0 8px 24px ${colors['orange-40']}30`,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -384,12 +516,103 @@ function LandingContent() {
   }
 
   // ════════════════════════════════════════
-  // STEP: TEST — 질문 플로우
+  // STEP: COLLECT — 이름/전화번호/지역 수집
+  // ════════════════════════════════════════
+  if (step === 'collect') {
+    return (
+      <div className="lp-page lp-form" style={{ background: '#fff' }}>
+        <style>{RESPONSIVE_CSS}</style>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 12 }}>
+          <button onClick={() => setStep('intro')}
+            style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}>
+            <ArrowLeft size={22} color="#141517" />
+          </button>
+          <span style={{ fontSize: 15, fontWeight: 600, color: '#141517' }}>
+            시작하기
+          </span>
+        </div>
+
+        <div className="lp-collect-section">
+          <h2 className="lp-collect-title" style={{
+            fontWeight: 900, color: '#141517', lineHeight: 1.4,
+            letterSpacing: -0.5, marginBottom: 8,
+          }}>
+            먼저 간단한 정보만<br />알려주세요
+          </h2>
+          <p style={{ fontSize: 15, color: '#727883', lineHeight: 1.5, marginBottom: 32 }}>
+            맞춤 자격증 추천과 학원 안내를 위해 필요해요.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
+              background: '#F8F9FA', borderRadius: 12, border: '1px solid #F3F4F6',
+            }}>
+              <User size={18} color="#B2B8C0" />
+              <input type="text" placeholder="이름" value={name} onChange={e => setName(e.target.value)}
+                style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 16, color: '#141517', outline: 'none' }} />
+            </div>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
+              background: '#F8F9FA', borderRadius: 12, border: '1px solid #F3F4F6',
+            }}>
+              <Phone size={18} color="#B2B8C0" />
+              <input type="tel" placeholder="전화번호" value={phone} onChange={e => setPhone(e.target.value)}
+                style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 16, color: '#141517', outline: 'none' }} />
+            </div>
+          </div>
+
+          {/* 지역 선택 */}
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#141517', marginBottom: 10 }}>
+            <MapPin size={14} style={{ display: 'inline', verticalAlign: -2, marginRight: 4 }} />
+            어디에서 다닐 수 있어요?
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 24 }}>
+            {REGION_OPTIONS.map(opt => (
+              <button key={opt.id} onClick={() => setRegion(opt.id)} className="press"
+                style={{
+                  padding: '14px 0', borderRadius: 12,
+                  border: `2px solid ${region === opt.id ? colors['orange-40'] : '#F3F4F6'}`,
+                  background: region === opt.id ? `${colors['orange-40']}08` : '#fff',
+                  fontSize: 15, fontWeight: region === opt.id ? 700 : 500,
+                  color: region === opt.id ? colors['orange-40'] : '#141517',
+                  cursor: 'pointer', transition: 'all 0.15s ease',
+                }}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {collectError && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12, textAlign: 'center' }}>{collectError}</p>}
+
+          <button onClick={handleCollectSubmit} disabled={saving} className="press" style={{
+            width: '100%', padding: '16px 0', borderRadius: 14, border: 'none',
+            background: saving ? '#B2B8C0' : colors['orange-40'],
+            fontSize: 17, fontWeight: 700, color: '#fff',
+            cursor: saving ? 'default' : 'pointer',
+            boxShadow: `0 8px 24px ${colors['orange-40']}30`,
+          }}>
+            {saving ? '저장 중...' : '테스트 시작하기'}
+          </button>
+
+          <p style={{ fontSize: 11, color: '#B2B8C0', textAlign: 'center', marginTop: 12, lineHeight: 1.5 }}>
+            입력하신 정보는 맞춤 학원 안내 목적으로만 사용되며,<br />외부에 제공하지 않습니다.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════
+  // STEP: TEST — 질문 플로우 (지역 제외 9문제)
   // ════════════════════════════════════════
   if (step === 'test') {
-    const question = questions[currentQ];
+    const question = testQuestions[currentQ];
     return (
-      <div style={{ minHeight: '100vh', background: '#fff', maxWidth: 430, margin: '0 auto', position: 'relative' }}>
+      <div className="lp-page lp-form" style={{ background: '#fff', position: 'relative' }}>
+        <style>{RESPONSIVE_CSS}</style>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 12 }}>
           <button onClick={handleTestBack}
@@ -420,14 +643,13 @@ function LandingContent() {
         </div>
 
         {/* Question */}
-        <div style={{
-          padding: '0 20px',
+        <div className="lp-test-pad" style={{
           opacity: animDir === 'exit' ? 0 : 1,
           transform: animDir === 'exit' ? 'translateX(-20px)' : animDir === 'enter' ? 'translateX(0)' : 'none',
           transition: 'opacity 0.2s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}>
           <div style={{ marginBottom: 32 }}>
-            <h2 style={{ fontSize: 24, fontWeight: 900, color: '#141517', lineHeight: 1.4, letterSpacing: -0.5, marginBottom: 8 }}>
+            <h2 className="lp-test-q" style={{ fontWeight: 900, color: '#141517', lineHeight: 1.4, letterSpacing: -0.5, marginBottom: 8 }}>
               {question.question}
             </h2>
             {question.subtitle && (
@@ -439,19 +661,17 @@ function LandingContent() {
             {question.options.map(option => {
               const isSelected = answers[question.id] === option.id;
               return (
-                <button key={option.id} onClick={() => handleSelect(option.id)} className="press"
+                <button key={option.id} onClick={() => handleSelect(option.id)} className="press lp-test-opt"
                   style={{
                     display: 'flex', alignItems: 'center', gap: 14,
-                    padding: '16px 18px', borderRadius: 14,
+                    borderRadius: 14,
                     border: `2px solid ${isSelected ? colors['orange-40'] : '#F3F4F6'}`,
                     background: isSelected ? `${colors['orange-40']}08` : '#fff',
                     cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s ease',
-                  }}>
-                  <span style={{
-                    flex: 1, fontSize: 16,
                     fontWeight: isSelected ? 700 : 500,
                     color: isSelected ? colors['orange-40'] : '#141517',
                   }}>
+                  <span style={{ flex: 1 }}>
                     {option.label}
                   </span>
                   {isSelected && <ChevronRight size={18} color={colors['orange-40']} />}
@@ -461,9 +681,9 @@ function LandingContent() {
           </div>
         </div>
 
-        <div style={{
+        <div className="lp-fixed-bar" style={{
           position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
-          maxWidth: 430, width: '100%', padding: '16px 20px',
+          padding: '16px 20px',
           paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
           textAlign: 'center', background: 'linear-gradient(transparent, rgba(255,255,255,0.95) 30%)',
         }}>
@@ -474,122 +694,27 @@ function LandingContent() {
   }
 
   // ════════════════════════════════════════
-  // STEP: GATE — 이름/전화번호
-  // ════════════════════════════════════════
-  if (step === 'gate') {
-    return (
-      <div style={{ minHeight: '100vh', background: '#fff', maxWidth: 430, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
-        <div style={{
-          background: `linear-gradient(135deg, ${colors['orange-40']}, ${colors['orange-60']})`,
-          padding: '40px 24px 32px', color: '#fff', textAlign: 'center',
-        }}>
-          <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-            <Trophy size={52} color="#fff" strokeWidth={1.5} />
-          </div>
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>
-            테스트 완료! 당신에게 맞는 자격증은
-          </p>
-          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>
-            {top3[0]?.name}
-          </h1>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            background: 'rgba(255,255,255,0.2)', borderRadius: 100,
-            padding: '8px 18px', fontSize: 15, fontWeight: 700,
-            backdropFilter: 'blur(4px)',
-          }}>
-            적합도 {top3[0]?.matchPercent}%
-          </div>
-        </div>
-
-        {/* 블러 프리뷰 */}
-        <div style={{ position: 'relative', padding: '20px 24px 0' }}>
-          <div style={{ filter: 'blur(8px)', opacity: 0.4, pointerEvents: 'none', userSelect: 'none' }}>
-            <div style={{ background: '#F3F4F6', borderRadius: 14, padding: 20, marginBottom: 12 }}>
-              <div style={{ height: 20, background: '#E5E7EB', borderRadius: 4, width: '60%', marginBottom: 8 }} />
-              <div style={{ height: 14, background: '#F3F4F6', borderRadius: 4, width: '80%', marginBottom: 6 }} />
-              <div style={{ height: 14, background: '#F3F4F6', borderRadius: 4, width: '70%' }} />
-            </div>
-            <div style={{ background: '#F3F4F6', borderRadius: 14, padding: 20 }}>
-              <div style={{ height: 20, background: '#E5E7EB', borderRadius: 4, width: '50%', marginBottom: 8 }} />
-              <div style={{ height: 14, background: '#F3F4F6', borderRadius: 4, width: '90%' }} />
-            </div>
-          </div>
-          <div style={{
-            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-          }}>
-            <Lock size={28} color="#727883" />
-            <span style={{ fontSize: 14, color: '#727883', fontWeight: 500 }}>상세 결과가 준비되었어요</span>
-          </div>
-        </div>
-
-        {/* 입력 폼 */}
-        <div style={{ padding: '28px 24px 40px', flex: 1 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 900, color: '#141517', marginBottom: 6, textAlign: 'center' }}>
-            결과 확인하기
-          </h2>
-          <p style={{ fontSize: 14, color: '#727883', marginBottom: 24, textAlign: 'center', lineHeight: 1.5 }}>
-            맞춤 자격증과 추천 학원 정보를<br />확인하려면 아래 정보를 입력해주세요
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
-              background: '#F8F9FA', borderRadius: 12, border: '1px solid #F3F4F6',
-            }}>
-              <User size={18} color="#B2B8C0" />
-              <input type="text" placeholder="이름" value={name} onChange={e => setName(e.target.value)}
-                style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 16, color: '#141517', outline: 'none' }} />
-            </div>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
-              background: '#F8F9FA', borderRadius: 12, border: '1px solid #F3F4F6',
-            }}>
-              <Phone size={18} color="#B2B8C0" />
-              <input type="tel" placeholder="전화번호" value={phone} onChange={e => setPhone(e.target.value)}
-                style={{ flex: 1, border: 'none', background: 'transparent', fontSize: 16, color: '#141517', outline: 'none' }} />
-            </div>
-          </div>
-
-          {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12, textAlign: 'center' }}>{error}</p>}
-
-          <button onClick={handleGateSubmit} disabled={loading} className="press" style={{
-            width: '100%', padding: '16px 0', borderRadius: 14, border: 'none',
-            background: loading ? '#B2B8C0' : colors['orange-40'],
-            fontSize: 17, fontWeight: 700, color: '#fff',
-            cursor: loading ? 'default' : 'pointer',
-          }}>
-            {loading ? '확인 중...' : '결과 보기'}
-          </button>
-
-          <p style={{ fontSize: 11, color: '#B2B8C0', textAlign: 'center', marginTop: 12, lineHeight: 1.5 }}>
-            입력하신 정보는 맞춤 학원 안내 목적으로만 사용되며,<br />외부에 제공하지 않습니다.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ════════════════════════════════════════
-  // STEP: RESULT
+  // STEP: RESULT — 바로 결과 공개
   // ════════════════════════════════════════
   const rankIcons = [Trophy, Medal, Award];
   const rankColors = [colors['orange-40'], '#6B7280', '#CD7F32'];
   const rankLabels = ['최고 적합', '추천', '추천'];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F8F9FA', maxWidth: 430, margin: '0 auto' }}>
+    <div className="lp-page lp-result" style={{ background: '#F8F9FA' }}>
+      <style>{RESPONSIVE_CSS}</style>
       {/* Hero Result */}
-      <div style={{
+      <div className="lp-result-hero" style={{
         background: `linear-gradient(135deg, ${colors['orange-40']}, ${colors['orange-60']})`,
-        padding: '32px 24px 28px', color: '#fff', textAlign: 'center',
+        color: '#fff', textAlign: 'center',
       }}>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>당신에게 가장 잘 맞는 자격증은</p>
         <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}>
           <Trophy size={48} color="#fff" strokeWidth={1.5} />
         </div>
-        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>{top3[0]?.name}</h1>
+        <h1 className="lp-result-name" style={{ fontWeight: 900, letterSpacing: -0.5, marginBottom: 8, color: '#fff' }}>
+          {top3[0]?.name}
+        </h1>
         <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5, marginBottom: 16 }}>
           {resultCopy[top3[0]?.categoryId]?.catchphrase}
         </p>
@@ -603,8 +728,10 @@ function LandingContent() {
       </div>
 
       {/* TOP 3 Cards */}
-      <div style={{ padding: '20px 20px 0' }}>
-        <h2 style={{ fontSize: 20, fontWeight: 900, color: '#141517', marginBottom: 16 }}>TOP 3 추천 자격증</h2>
+      <div className="lp-result-cards">
+        <h2 className="lp-result-section-title" style={{ fontWeight: 900, color: '#141517', marginBottom: 16 }}>
+          TOP 3 추천 자격증
+        </h2>
 
         {top3.map((result, idx) => {
           const copy = resultCopy[result.categoryId];
@@ -630,7 +757,7 @@ function LandingContent() {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#141517' }}>{result.name}</span>
+                    <span className="lp-result-card-name" style={{ fontWeight: 700, color: '#141517' }}>{result.name}</span>
                     <span style={{
                       fontSize: 10, fontWeight: 700, color: rankColors[idx],
                       background: `${rankColors[idx]}12`, padding: '2px 8px', borderRadius: 100,
@@ -639,7 +766,7 @@ function LandingContent() {
                   <span style={{ fontSize: 13, color: '#727883' }}>예상 월급 {result.salaryRange}</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 22, fontWeight: 900, color: rankColors[idx] }}>{result.matchPercent}%</div>
+                  <div className="lp-result-match" style={{ fontWeight: 900, color: rankColors[idx] }}>{result.matchPercent}%</div>
                   <span style={{ fontSize: 11, color: '#B2B8C0' }}>적합도</span>
                 </div>
               </div>
@@ -701,9 +828,9 @@ function LandingContent() {
       </div>
 
       {/* Bottom CTAs */}
-      <div style={{
+      <div className="lp-result-bottom" style={{
         position: 'sticky', bottom: 0,
-        padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
+        paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
         background: 'linear-gradient(transparent, #fff 20%)',
       }}>
         <div style={{ display: 'flex', gap: 10 }}>
