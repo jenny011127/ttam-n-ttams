@@ -173,7 +173,7 @@ const RESPONSIVE_CSS = `
 }
 `;
 
-type Step = 'intro' | 'collect' | 'test' | 'result';
+type Step = 'intro' | 'collect' | 'test' | 'result' | 'splash';
 
 function LandingContent() {
   const router = useRouter();
@@ -198,7 +198,22 @@ function LandingContent() {
 
   // 하단 고정 CTA 표시 여부
   const footerCtaRef = useRef<HTMLElement>(null);
-  const [showSticky, setShowSticky] = useState(true);
+  const heroCtaRef = useRef<HTMLDivElement>(null);
+  const [showSticky, setShowSticky] = useState(false);
+
+  // 스플래시 + 회원가입
+  const [splashReady, setSplashReady] = useState(false);
+  const [signupId, setSignupId] = useState('');
+  const [signupPw, setSignupPw] = useState('');
+  const [signupError, setSignupError] = useState('');
+  const [signupLoading, setSignupLoading] = useState(false);
+
+  useEffect(() => {
+    if (step !== 'splash') return;
+    setSplashReady(false);
+    const timer = setTimeout(() => setSplashReady(true), 2000);
+    return () => clearTimeout(timer);
+  }, [step]);
 
   useEffect(() => {
     trackEvent('lp_view', { page: '/landing', eventData: { utm_source: utmSource } });
@@ -207,10 +222,13 @@ function LandingContent() {
   useEffect(() => {
     if (step !== 'intro') return;
     const onScroll = () => {
-      if (footerCtaRef.current) {
-        const footerTop = footerCtaRef.current.getBoundingClientRect().top;
-        setShowSticky(footerTop > window.innerHeight);
-      }
+      const heroBtn = heroCtaRef.current;
+      const footerCta = footerCtaRef.current;
+      if (!heroBtn) return;
+      const heroBtnBottom = heroBtn.getBoundingClientRect().bottom;
+      const pastHero = heroBtnBottom < 0;
+      const atFooter = footerCta ? footerCta.getBoundingClientRect().top < window.innerHeight : false;
+      setShowSticky(pastHero && !atFooter);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -365,7 +383,7 @@ function LandingContent() {
               딱 맞는 자격증 + 집 근처 학원까지 알려드려요.
             </p>
 
-            <div className="lp-hero-cta">
+            <div className="lp-hero-cta" ref={heroCtaRef} style={{ marginTop: 32 }}>
               <button
                 onClick={handleStart}
                 className="press lp-hero-btn"
@@ -375,7 +393,6 @@ function LandingContent() {
                   background: colors['orange-40'],
                   fontWeight: 700,
                   color: '#fff', cursor: 'pointer',
-                  boxShadow: `0 8px 24px ${colors['orange-40']}30`,
                 }}
               >
                 무료로 테스트 시작하기
@@ -573,11 +590,12 @@ function LandingContent() {
 
         {/* ─── 하단 고정 CTA ─── */}
         <div className="lp-fixed-bar" style={{
-          position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+          position: 'fixed', bottom: 0, left: '50%',
           padding: '12px 20px',
           paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
           background: 'linear-gradient(transparent, #fff 30%)',
-          transition: 'opacity 0.3s, transform 0.3s',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s',
+          transform: showSticky ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(100%)',
           opacity: showSticky ? 1 : 0,
           pointerEvents: showSticky ? 'auto' : 'none',
         }}>
@@ -590,7 +608,6 @@ function LandingContent() {
               background: colors['orange-40'],
               fontWeight: 700,
               color: '#fff', cursor: 'pointer',
-              boxShadow: `0 8px 24px ${colors['orange-40']}30`,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}
           >
@@ -780,6 +797,165 @@ function LandingContent() {
   }
 
   // ════════════════════════════════════════
+  // STEP: SPLASH → 회원가입
+  // ════════════════════════════════════════
+  if (step === 'splash') {
+    const handleSignup = async () => {
+      if (!signupId.trim()) { setSignupError('아이디를 입력해주세요'); return; }
+      if (signupId.trim().length < 4) { setSignupError('아이디는 4자 이상이어야 해요'); return; }
+      if (!signupPw.trim()) { setSignupError('비밀번호를 입력해주세요'); return; }
+      if (signupPw.trim().length < 6) { setSignupError('비밀번호는 6자 이상이어야 해요'); return; }
+      setSignupError('');
+      setSignupLoading(true);
+
+      try {
+        if (supabase) {
+          await supabase.from('leads').update({
+            login_id: signupId.trim(),
+          }).eq('phone', phone.trim()).eq('name', name.trim());
+        }
+      } catch (e) { console.error('Signup error:', e); }
+
+      trackEvent('lp_signup', { page: '/landing' });
+      setSignupLoading(false);
+      router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`);
+    };
+
+    return (
+      <div className="lp-page" style={{
+        background: '#141517', color: '#fff',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+      }}>
+        <style>{RESPONSIVE_CSS}</style>
+        <style>{`
+          @keyframes splashFadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+          @keyframes splashSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        `}</style>
+
+        {/* 브랜드 로고 */}
+        <div style={{
+          animation: 'splashFadeIn 0.8s ease-out',
+          textAlign: 'center',
+          marginBottom: splashReady ? 48 : 0,
+          transition: 'margin-bottom 0.5s ease',
+        }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: 24,
+            background: `linear-gradient(135deg, ${colors['orange-40']}, ${colors['orange-60']})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px',
+            boxShadow: `0 16px 48px ${colors['orange-40']}40`,
+          }}>
+            <Sparkles size={36} color="#fff" />
+          </div>
+          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>
+            땀앤땀스
+          </h1>
+          <p style={{ fontSize: 15, color: '#727883' }}>
+            자격증 학원 비교 플랫폼
+          </p>
+        </div>
+
+        {/* 2초 후 회원가입 폼 등장 */}
+        {splashReady && (
+          <div style={{
+            animation: 'splashSlideUp 0.5s ease-out',
+            width: '100%', maxWidth: 380, padding: '0 24px',
+          }}>
+            <div style={{
+              background: 'rgba(255,255,255,0.06)',
+              borderRadius: 20, padding: '28px 24px',
+              border: '1px solid rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(10px)',
+            }}>
+              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, textAlign: 'center' }}>
+                회원가입
+              </h2>
+              <p style={{ fontSize: 13, color: '#727883', marginBottom: 24, textAlign: 'center' }}>
+                가입하면 맞춤 학원 추천을 받을 수 있어요
+              </p>
+
+              {/* 이름/전화번호 (이미 입력됨) */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <div style={{
+                  flex: 1, padding: '12px 14px',
+                  background: 'rgba(255,255,255,0.05)', borderRadius: 10,
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  fontSize: 14, color: '#727883',
+                }}>
+                  {name || '이름'}
+                </div>
+                <div style={{
+                  flex: 1, padding: '12px 14px',
+                  background: 'rgba(255,255,255,0.05)', borderRadius: 10,
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  fontSize: 14, color: '#727883',
+                }}>
+                  {phone || '전화번호'}
+                </div>
+              </div>
+
+              {/* 아이디 */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
+                background: 'rgba(255,255,255,0.08)', borderRadius: 10,
+                border: '1px solid rgba(255,255,255,0.12)', marginBottom: 10,
+              }}>
+                <User size={16} color="#727883" />
+                <input type="text" placeholder="아이디 (4자 이상)" value={signupId}
+                  onChange={e => setSignupId(e.target.value)}
+                  style={{
+                    flex: 1, border: 'none', background: 'transparent',
+                    fontSize: 15, color: '#fff', outline: 'none',
+                  }} />
+              </div>
+
+              {/* 비밀번호 */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
+                background: 'rgba(255,255,255,0.08)', borderRadius: 10,
+                border: '1px solid rgba(255,255,255,0.12)', marginBottom: 16,
+              }}>
+                <Check size={16} color="#727883" />
+                <input type="password" placeholder="비밀번호 (6자 이상)" value={signupPw}
+                  onChange={e => setSignupPw(e.target.value)}
+                  style={{
+                    flex: 1, border: 'none', background: 'transparent',
+                    fontSize: 15, color: '#fff', outline: 'none',
+                  }} />
+              </div>
+
+              {signupError && (
+                <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12, textAlign: 'center' }}>{signupError}</p>
+              )}
+
+              <button onClick={handleSignup} disabled={signupLoading} className="press" style={{
+                width: '100%', padding: '15px 0', borderRadius: 12, border: 'none',
+                background: signupLoading ? '#727883' : colors['orange-40'],
+                fontSize: 16, fontWeight: 700, color: '#fff',
+                cursor: signupLoading ? 'default' : 'pointer',
+                boxShadow: `0 6px 20px ${colors['orange-40']}25`,
+              }}>
+                {signupLoading ? '가입 중...' : '가입하고 학원 보기'}
+              </button>
+
+              <button onClick={() => router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`)}
+                style={{
+                  width: '100%', padding: '12px 0', marginTop: 10,
+                  background: 'none', border: 'none',
+                  fontSize: 14, color: '#727883', cursor: 'pointer',
+                }}>
+                나중에 할게요
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ════════════════════════════════════════
   // STEP: RESULT — 바로 결과 공개
   // ════════════════════════════════════════
   const rankIcons = [Trophy, Medal, Award];
@@ -913,32 +1089,21 @@ function LandingContent() {
         })}
       </div>
 
-      {/* Bottom CTAs */}
+      {/* Bottom CTA */}
       <div className="lp-result-bottom" style={{
         position: 'sticky', bottom: 0,
         paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
         background: 'linear-gradient(transparent, #fff 20%)',
       }}>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={() => router.push(`/?tab=search&category=${top3[selectedIdx]?.categoryId}&region=${userRegion}`)}
-            className="press" style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              padding: '15px 0', borderRadius: 14, border: 'none',
-              background: colors['orange-40'], fontSize: 15, fontWeight: 700, color: '#fff',
-              cursor: 'pointer', boxShadow: `0 6px 20px ${colors['orange-40']}30`,
-            }}>
-            <MapPin size={16} /> 집 근처 학원 보기
-          </button>
-          <button onClick={() => router.push('/?tab=search&gov=true')}
-            className="press" style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              padding: '15px 0', borderRadius: 14,
-              border: `1.5px solid ${colors.government}`, background: '#fff',
-              fontSize: 15, fontWeight: 700, color: colors.government, cursor: 'pointer',
-            }}>
-            무료 수강 학원 보기
-          </button>
-        </div>
+        <button onClick={() => { setStep('splash'); window.scrollTo(0, 0); }}
+          className="press" style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            padding: '16px 0', borderRadius: 14, border: 'none',
+            background: colors['orange-40'], fontSize: 16, fontWeight: 700, color: '#fff',
+            cursor: 'pointer', boxShadow: `0 6px 20px ${colors['orange-40']}30`,
+          }}>
+          무료 수강 학원 보기 <ArrowRight size={18} />
+        </button>
       </div>
     </div>
   );
