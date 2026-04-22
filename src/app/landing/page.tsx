@@ -472,7 +472,7 @@ function LandingContent() {
         </section>
 
         {/* ─── FAQ ─── */}
-        <section className="lp-faq-section" style={{ background: '#fff' }}>
+        <section className="lp-section" style={{ background: '#fff' }}>
           <div className="lp-faq-inner">
             <h2 className="lp-faq-heading" style={{ fontWeight: 900, marginBottom: 20, color: '#141517' }}>
               자주 묻는 질문
@@ -487,6 +487,71 @@ function LandingContent() {
             ))}
           </div>
         </section>
+
+        {/* ─── 하단 CTA 섹션 ─── */}
+        <section style={{
+          position: 'relative', background: '#141517',
+          padding: '80px 24px', textAlign: 'center', overflow: 'hidden',
+        }}>
+          <div style={{ position: 'relative', zIndex: 1, maxWidth: 480, margin: '0 auto' }}>
+            <h2 className="lp-worry-heading" style={{
+              fontWeight: 900, color: '#fff', marginBottom: 16, lineHeight: 1.4,
+            }}>
+              자격증 준비,<br />지금 시작하세요
+            </h2>
+            <p style={{ fontSize: 15, color: '#B2B8C0', marginBottom: 32, lineHeight: 1.6 }}>
+              1분이면 나에게 딱 맞는 자격증과<br />집 근처 학원까지 한 번에 알 수 있어요.
+            </p>
+            <button
+              onClick={handleStart}
+              className="press"
+              style={{
+                display: 'inline-block', padding: '16px 40px',
+                borderRadius: 16, border: 'none',
+                background: colors['orange-40'],
+                fontSize: 17, fontWeight: 700, color: '#fff',
+                cursor: 'pointer',
+                boxShadow: `0 8px 24px ${colors['orange-40']}30`,
+              }}
+            >
+              무료로 테스트 시작하기
+            </button>
+          </div>
+        </section>
+
+        {/* ─── 푸터 ─── */}
+        <footer style={{ padding: '56px 24px', background: '#141517' }}>
+          <div className="lp-section-inner" style={{
+            display: 'flex', flexDirection: 'column', gap: 32, fontSize: 14, color: '#727883',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 32 }}>
+              <div>
+                <p style={{ color: '#fff', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>땀앤땀스</p>
+                <p>자격증 학원 비교 플랫폼</p>
+              </div>
+              <div style={{ display: 'flex', gap: 40 }}>
+                <div>
+                  <p style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, marginBottom: 8 }}>서비스</p>
+                  <p onClick={handleStart} style={{ cursor: 'pointer', marginBottom: 6 }}>적성 테스트</p>
+                  <p onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>학원 둘러보기</p>
+                </div>
+                <div>
+                  <p style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600, marginBottom: 8 }}>고객지원</p>
+                  <p style={{ marginBottom: 6 }}>이용약관</p>
+                  <p>개인정보처리방침</p>
+                </div>
+              </div>
+            </div>
+            <div style={{
+              paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)',
+              lineHeight: 1.8,
+            }}>
+              <p>땀앤땀스 · 자격증 학원 비교 서비스</p>
+              <p>문의: ttam.n.ttams@gmail.com</p>
+              <p style={{ marginTop: 16, color: 'rgba(114,120,131,0.6)' }}>© 2025 땀앤땀스. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
 
         {/* ─── 하단 고정 CTA ─── */}
         <div className="lp-fixed-bar" style={{
