@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, Suspense } from 'react';
+import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft, ChevronRight, Trophy, Medal, Award, MapPin,
@@ -196,9 +196,25 @@ function LandingContent() {
   const [collectError, setCollectError] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // 하단 고정 CTA 표시 여부
+  const footerCtaRef = useRef<HTMLElement>(null);
+  const [showSticky, setShowSticky] = useState(true);
+
   useEffect(() => {
     trackEvent('lp_view', { page: '/landing', eventData: { utm_source: utmSource } });
   }, []);
+
+  useEffect(() => {
+    if (step !== 'intro') return;
+    const onScroll = () => {
+      if (footerCtaRef.current) {
+        const footerTop = footerCtaRef.current.getBoundingClientRect().top;
+        setShowSticky(footerTop > window.innerHeight);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [step]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -489,7 +505,7 @@ function LandingContent() {
         </section>
 
         {/* ─── 하단 CTA 섹션 ─── */}
-        <section style={{
+        <section ref={footerCtaRef} style={{
           position: 'relative', background: '#141517',
           padding: '80px 24px', textAlign: 'center', overflow: 'hidden',
         }}>
@@ -546,9 +562,11 @@ function LandingContent() {
               paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)',
               lineHeight: 1.8,
             }}>
-              <p>땀앤땀스 · 자격증 학원 비교 서비스</p>
-              <p>문의: ttam.n.ttams@gmail.com</p>
-              <p style={{ marginTop: 16, color: 'rgba(114,120,131,0.6)' }}>© 2025 땀앤땀스. All rights reserved.</p>
+              <p>주식회사 대시(DA-SH) · 대표 도영민</p>
+              <p>서울특별시 중구 세종대로 136, 3층 에스3097호(무교동, 파이낸스빌딩)</p>
+              <p>전화번호 : 010-8896-4567 · 사업자등록번호 : 340-87-03755</p>
+              <p>통신판매업신고번호 : 제2026-서울중구-204호</p>
+              <p style={{ marginTop: 16, color: 'rgba(114,120,131,0.6)' }}>© 2025 DA-SH. All rights reserved.</p>
             </div>
           </div>
         </footer>
@@ -559,6 +577,9 @@ function LandingContent() {
           padding: '12px 20px',
           paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
           background: 'linear-gradient(transparent, #fff 30%)',
+          transition: 'opacity 0.3s, transform 0.3s',
+          opacity: showSticky ? 1 : 0,
+          pointerEvents: showSticky ? 'auto' : 'none',
         }}>
           <button
             onClick={handleStart}
