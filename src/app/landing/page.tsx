@@ -26,11 +26,6 @@ const REGION_OPTIONS = [
   { id: 'other', label: '그 외 지역' },
 ];
 
-const ROLLING_CERTS = [
-  '용접기능사', '전기기능사', '배관기능사', '요양보호사',
-  '지게차운전', '타일기능사', '네일아트', '냉동기계',
-];
-
 const WORRIES = [
   '자격증 따고 싶은데\n뭘 따야 할지 모르겠어',
   '학원이 너무 많은데\n어디가 좋은지 모르겠어',
@@ -185,10 +180,6 @@ function LandingContent() {
   const [answers, setAnswers] = useState<Answers>({});
   const [animDir, setAnimDir] = useState<'enter' | 'exit' | null>(null);
 
-  // 롤링 텍스트
-  const [certIdx, setCertIdx] = useState(0);
-  const [certFade, setCertFade] = useState(true);
-
   // 리드 수집 (collect 단계)
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -233,17 +224,6 @@ function LandingContent() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, [step]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCertFade(false);
-      setTimeout(() => {
-        setCertIdx(prev => (prev + 1) % ROLLING_CERTS.length);
-        setCertFade(true);
-      }, 300);
-    }, 2000);
-    return () => clearInterval(timer);
-  }, []);
 
   const total = testQuestions.length;
   const progress = step === 'test' ? ((currentQ) / total) * 100 : 0;
@@ -374,35 +354,37 @@ function LandingContent() {
             </div>
 
             <h1 className="lp-hero-title" style={{
-              fontWeight: 900, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 24, color: '#141517',
+              fontWeight: 900, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 16, color: '#141517',
             }}>
-              <span style={{ color: colors['orange-40'] }}>내일배움카드</span>로<br />
-              뭘 배울지 모르겠다면?<br />
-              <span style={{
-                color: colors['orange-40'],
-                display: 'inline-block', minWidth: '5em',
-                transition: 'opacity 0.3s, transform 0.3s',
-                opacity: certFade ? 1 : 0,
-                transform: certFade ? 'translateY(0)' : 'translateY(8px)',
-              }}>
-                {ROLLING_CERTS[certIdx]}
-              </span>
+              자격증 따야겠다는데,<br />
+              뭐가 나한테 맞을까?
             </h1>
 
-            {/* ─── Q1 카드 위 배너 (확인 사살) ─── */}
-            <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: 10,
-              background: `linear-gradient(135deg, ${colors['orange-40']}10, ${colors['orange-40']}04)`,
-              border: `1px solid ${colors['orange-40']}25`,
-              borderRadius: 14, padding: '14px 16px', marginBottom: 14,
-              textAlign: 'left',
+            <p style={{
+              fontSize: 15, color: '#4B5563', lineHeight: 1.6,
+              marginBottom: 24,
             }}>
-              <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0, marginTop: 2 }}>💰</span>
+              30초 테스트로{' '}
+              <span style={{ color: colors['orange-40'], fontWeight: 700 }}>
+                국비지원으로 무료 수강
+              </span>
+              {' '}가능한 자격증 찾아드려요.
+            </p>
+
+            {/* ─── Q1 카드 위 배너 (네이비) ─── */}
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: 12,
+              background: `linear-gradient(135deg, ${colors.navy}, #2A3244)`,
+              borderRadius: 14, padding: '16px 18px', marginBottom: 14,
+              textAlign: 'left',
+              boxShadow: `0 4px 16px ${colors.navy}30`,
+            }}>
+              <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>💰</span>
               <div>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#141517', lineHeight: 1.4, marginBottom: 2 }}>
-                  추천 자격증, 전부 <span style={{ color: colors['orange-40'] }}>무료 수강 가능</span>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.4, marginBottom: 4 }}>
+                  추천 자격증, 전부 <span style={{ color: colors['orange-40'] }}>국비 무료 수강 가능</span>
                 </p>
-                <p style={{ fontSize: 12, color: '#727883', lineHeight: 1.5 }}>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
                   내일배움카드 없어도 괜찮아요. 발급 가이드까지 안내해드려요.
                 </p>
               </div>
@@ -416,6 +398,25 @@ function LandingContent() {
               boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
               textAlign: 'left',
             }}>
+              {/* 질문 시작 안내 */}
+              <div style={{
+                paddingBottom: 16, marginBottom: 16,
+                borderBottom: '1px dashed #E5E7EB',
+              }}>
+                <p style={{
+                  fontSize: 13, fontWeight: 700, color: colors['orange-40'],
+                  marginBottom: 6,
+                }}>
+                  ✋ 잠깐, 질문 하나만 먼저 할게요
+                </p>
+                <p style={{
+                  fontSize: 13, color: '#4B5563', lineHeight: 1.55,
+                }}>
+                  체력·성격·목표에 따라 맞는 자격증이 완전히 달라져요.<br />
+                  짧은 <b>10개 질문</b>으로 분석해드릴게요. 30초면 끝나요.
+                </p>
+              </div>
+
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 4,
                 fontSize: 11, fontWeight: 700, color: colors['orange-40'],
