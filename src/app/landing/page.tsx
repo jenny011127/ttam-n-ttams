@@ -575,7 +575,7 @@ function LandingContent() {
         </section>
 
         {/* ─── 포용 섹션 (누가 올 수 있냐고요?) ─── */}
-        <section className="lp-section" style={{ background: '#141517', color: '#fff' }}>
+        <section className="lp-section" style={{ background: '#F8F9FA' }}>
           <div className="lp-section-inner">
             <p className="lp-target-label" style={{
               fontWeight: 700, color: colors['orange-40'], marginBottom: 10,
@@ -583,7 +583,7 @@ function LandingContent() {
               누가 올 수 있냐고요?
             </p>
             <h2 className="lp-target-heading" style={{
-              fontWeight: 900, lineHeight: 1.4, marginBottom: 24, color: '#fff',
+              fontWeight: 900, lineHeight: 1.4, marginBottom: 24, color: '#141517',
             }}>
               내일배움카드,<br />생각보다 훨씬 많은 사람이 됩니다.
             </h2>
@@ -601,8 +601,8 @@ function LandingContent() {
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 12,
                   padding: '14px 18px', borderRadius: 14,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: '#fff',
+                  border: '1px solid #F3F4F6',
                 }}>
                   <div style={{
                     width: 22, height: 22, borderRadius: '50%',
@@ -612,13 +612,13 @@ function LandingContent() {
                   }}>
                     <Check size={13} color="#fff" strokeWidth={3} />
                   </div>
-                  <span style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{item}</span>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: '#141517' }}>{item}</span>
                 </div>
               ))}
             </div>
 
             <p style={{
-              fontSize: 13, color: 'rgba(255,255,255,0.6)',
+              fontSize: 13, color: '#B2B8C0',
               marginTop: 20, lineHeight: 1.6, textAlign: 'center',
             }}>
               * 만 15세 이상 대한민국 국민 대부분이 신청 가능해요
