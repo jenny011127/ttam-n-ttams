@@ -155,7 +155,8 @@ export default function RegionSheet({ open, selectedRegionId, onClose, onSelect 
             <div style={{ padding: '0 8px' }}>
               {/* 전국 */}
               <RegionRow
-                label="🌏  전국 전체"
+                emoji="🌏"
+                label="전국 전체"
                 selected={selectedRegionId === 'all'}
                 onClick={() => handleSelect('all')}
               />
@@ -166,7 +167,8 @@ export default function RegionSheet({ open, selectedRegionId, onClose, onSelect 
                   return (
                     <RegionRow
                       key={group.id}
-                      label={`${group.emoji}  ${group.label}`}
+                      emoji={group.emoji}
+                      label={group.label}
                       selected={selectedRegionId === group.id}
                       onClick={() => handleSelect(group.id)}
                     />
@@ -184,7 +186,10 @@ export default function RegionSheet({ open, selectedRegionId, onClose, onSelect 
                         color: colors.black,
                       }}
                     >
-                      <span>{group.emoji}  {group.label}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span className="tossface" style={{ fontSize: 18, lineHeight: 1 }}>{group.emoji}</span>
+                        {group.label}
+                      </span>
                       {isExpanded ? <ChevronUp size={18} color={colors['gray-60']} /> : <ChevronDown size={18} color={colors['gray-60']} />}
                     </button>
                     {isExpanded && (
@@ -217,8 +222,9 @@ export default function RegionSheet({ open, selectedRegionId, onClose, onSelect 
   );
 }
 
-function RegionRow({ label, selected, onClick, size = 'md' }: {
+function RegionRow({ label, emoji, selected, onClick, size = 'md' }: {
   label: string;
+  emoji?: string;
   selected: boolean;
   onClick: () => void;
   size?: 'sm' | 'md';
@@ -239,7 +245,12 @@ function RegionRow({ label, selected, onClick, size = 'md' }: {
         textAlign: 'left',
       }}
     >
-      <span>{label}</span>
+      <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {emoji && (
+          <span className="tossface" style={{ fontSize: size === 'sm' ? 15 : 18, lineHeight: 1 }}>{emoji}</span>
+        )}
+        {label}
+      </span>
       {selected && <Check size={18} color={colors['orange-40']} />}
     </button>
   );
