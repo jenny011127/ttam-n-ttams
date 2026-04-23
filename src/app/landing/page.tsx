@@ -235,17 +235,6 @@ function LandingContent() {
     window.scrollTo(0, 0);
   };
 
-  // intro에서 Q1 인라인 선택 → 바로 test 단계로 진입 (Q2부터)
-  const handleInlineFirstAnswer = (optionId: string) => {
-    const firstQ = testQuestions[0];
-    const newAnswers = { ...answers, [firstQ.id]: optionId };
-    setAnswers(newAnswers);
-    trackEvent('lp_test_start', { page: '/landing', eventData: { inline: true } });
-    setStep('test');
-    setCurrentQ(1);
-    window.scrollTo(0, 0);
-  };
-
   // ─── Collect → DB 저장 후 테스트 시작 ───
   const handleCollectSubmit = async () => {
     if (!name.trim()) { setCollectError('이름을 입력해주세요'); return; }
@@ -350,14 +339,14 @@ function LandingContent() {
               fontSize: 13, fontWeight: 600, color: colors['orange-40'],
             }}>
               <Sparkles size={14} />
-              무료 · 1분 · 10개 질문
+              무료 · 30초 테스트
             </div>
 
             <h1 className="lp-hero-title" style={{
-              fontWeight: 900, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 16, color: '#141517',
+              fontWeight: 900, lineHeight: 1.25, letterSpacing: -0.5, marginBottom: 14, color: '#141517',
             }}>
-              자격증 따야겠다는데,<br />
-              뭐가 나한테 맞을까?
+              월 <span style={{ color: colors['orange-40'] }}>400만원</span> 버는 자격증,<br />
+              나도 할 수 있을까?
             </h1>
 
             <p style={{
@@ -371,102 +360,70 @@ function LandingContent() {
               {' '}가능한 자격증 찾아드려요.
             </p>
 
-            {/* ─── Q1 카드 위 배너 (네이비) ─── */}
+            {/* ─── 실명 케이스 카드 ─── */}
             <div style={{
-              display: 'flex', alignItems: 'flex-start', gap: 12,
-              background: `linear-gradient(135deg, ${colors.navy}, #2A3244)`,
-              borderRadius: 14, padding: '16px 18px', marginBottom: 14,
+              background: '#fff',
+              borderRadius: 16,
+              padding: '16px 18px',
+              marginBottom: 18,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04)',
               textAlign: 'left',
-              boxShadow: `0 4px 16px ${colors.navy}30`,
             }}>
-              <span className="tossface" style={{ fontSize: 24, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>💰</span>
-              <div>
-                <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.4, marginBottom: 4 }}>
-                  추천 자격증, 전부 <span style={{ color: colors['orange-40'] }}>국비 무료 수강 가능</span>
-                </p>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
-                  내일배움카드 없어도 괜찮아요. 발급 가이드까지 안내해드려요.
-                </p>
-              </div>
+              {[
+                { emoji: '👷', age: '48', sur: '김', cert: '지게차운전', salary: '월 380만원', place: '물류센터' },
+                { emoji: '👩‍⚕️', age: '52', sur: '이', cert: '요양보호사', salary: '월 220만원', place: '주 3일 근무' },
+                { emoji: '🔥', age: '35', sur: '박', cert: '용접기능사', salary: '월 500만원', place: '조선소' },
+              ].map((c, i, arr) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '10px 0',
+                  borderBottom: i < arr.length - 1 ? '1px dashed #F3F4F6' : 'none',
+                }}>
+                  <span className="tossface" style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }}>{c.emoji}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#141517', marginBottom: 2, lineHeight: 1.3 }}>
+                      {c.age}세 {c.sur} 씨 · {c.cert}
+                    </p>
+                    <p style={{ fontSize: 12, color: '#727883', lineHeight: 1.3 }}>
+                      {c.place} 취업 <span style={{ color: colors['orange-40'], fontWeight: 700 }}>{c.salary}</span>
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* ─── 인라인 Q1 (바로 시작) ─── */}
-            <div ref={heroCtaRef} style={{
-              background: '#fff',
-              borderRadius: 20,
-              padding: '24px 20px',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
-              textAlign: 'left',
+            {/* ─── 소셜 프루프 (히어로 강조) ─── */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              background: `${colors['orange-40']}10`,
+              border: `1px solid ${colors['orange-40']}25`,
+              borderRadius: 12, padding: '10px 14px', marginBottom: 16,
             }}>
-              {/* 질문 시작 안내 */}
-              <div style={{
-                paddingBottom: 16, marginBottom: 16,
-                borderBottom: '1px dashed #E5E7EB',
-              }}>
-                <p style={{
-                  fontSize: 13, fontWeight: 700, color: colors['orange-40'],
-                  marginBottom: 6,
-                }}>
-                  <span className="tossface">✋</span> 잠깐, 질문 하나만 먼저 할게요
-                </p>
-                <p style={{
-                  fontSize: 13, color: '#4B5563', lineHeight: 1.55,
-                }}>
-                  체력·성격·목표에 따라 맞는 자격증이 완전히 달라져요.<br />
-                  짧은 <b>10개 질문</b>으로 분석해드릴게요. 30초면 끝나요.
-                </p>
-              </div>
+              <span className="tossface" style={{ fontSize: 18, lineHeight: 1 }}>🔥</span>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#141517' }}>
+                이 달 <span style={{ color: colors['orange-40'] }}>1,247명</span>이 테스트 받았어요
+              </p>
+            </div>
 
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 4,
-                fontSize: 11, fontWeight: 700, color: colors['orange-40'],
-                marginBottom: 10,
-              }}>
-                Q1 <span style={{ color: '#B2B8C0', fontWeight: 500 }}>/ 10</span>
-              </div>
-              <h2 style={{
-                fontSize: 19, fontWeight: 800, color: '#141517',
-                lineHeight: 1.4, marginBottom: 4,
-              }}>
-                {testQuestions[0].question}
-              </h2>
-              {testQuestions[0].subtitle && (
-                <p style={{ fontSize: 14, color: '#727883', marginBottom: 16 }}>
-                  {testQuestions[0].subtitle}
-                </p>
-              )}
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
-                {testQuestions[0].options.map(opt => (
-                  <button
-                    key={opt.id}
-                    onClick={() => handleInlineFirstAnswer(opt.id)}
-                    className="press"
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      width: '100%', padding: '16px 18px',
-                      borderRadius: 14, border: '2px solid #F3F4F6',
-                      background: '#fff', cursor: 'pointer',
-                      fontSize: 16, fontWeight: 600, color: '#141517',
-                      textAlign: 'left', transition: 'all 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = colors['orange-40'];
-                      e.currentTarget.style.background = `${colors['orange-40']}06`;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#F3F4F6';
-                      e.currentTarget.style.background = '#fff';
-                    }}
-                  >
-                    <span>{opt.label}</span>
-                    <ChevronRight size={18} color="#B2B8C0" />
-                  </button>
-                ))}
-              </div>
-
-              <p style={{ fontSize: 11, color: '#B2B8C0', textAlign: 'center', marginTop: 14, lineHeight: 1.5 }}>
-                선택하면 자동으로 다음 질문으로 · 이 달 1,247명 참여
+            {/* ─── CTA 버튼 ─── */}
+            <div ref={heroCtaRef}>
+              <button
+                onClick={handleStart}
+                className="press lp-hero-btn"
+                style={{
+                  width: '100%',
+                  borderRadius: 16, border: 'none',
+                  background: colors['orange-40'],
+                  fontWeight: 700,
+                  color: '#fff', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  boxShadow: `0 8px 24px ${colors['orange-40']}30`,
+                }}
+              >
+                나에게 맞는 자격증 찾기 <ArrowRight size={18} />
+              </button>
+              <p style={{ fontSize: 11, color: '#B2B8C0', marginTop: 10, lineHeight: 1.5 }}>
+                내일배움카드 없어도 OK · 전화 오지 않아요
               </p>
             </div>
           </div>
