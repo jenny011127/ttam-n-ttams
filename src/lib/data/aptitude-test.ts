@@ -340,23 +340,6 @@ const certProfiles: CertProfile[] = [
     goalFit: { stable: 4, money: 5, startup: 10, skill: 7 },
     statusFit: { student: 8, jobseeker: 8, 'career-change': 7, employed: 4 },
   },
-  {
-    categoryId: 'pilates-yoga',
-    name: '필라테스/요가',
-    baseScore: 50,
-    salaryRange: '220~400만원',
-    description: 'MZ세대 인기 자격증. 건강한 라이프스타일과 함께하는 직업',
-    keywords: ['MZ세대', '건강', '라이프스타일', '트렌디'],
-    genderFit: { male: 4, female: 10 },
-    ageFit: { teen: 5, '20s': 10, '30s': 8, '40plus': 3 },
-    physicalFit: { strong: 8, average: 7, weak: 3 },
-    dexterityFit: { skilled: 6, average: 7, clumsy: 5 },
-    dangerFit: { ok: 5, moderate: 7, no: 10 },
-    salaryFit: { '200': 6, '300': 8, '400': 6, '500': 3 },
-    workstyleFit: { 'hands-on': 4, service: 8, creative: 6, technical: 3 },
-    goalFit: { stable: 5, money: 4, startup: 9, skill: 7 },
-    statusFit: { student: 7, jobseeker: 8, 'career-change': 8, employed: 5 },
-  },
 ];
 
 // ─── 콤보 보너스 ───
@@ -373,10 +356,10 @@ const comboRules: ComboRule[] = [
     bonus: { welding: 15, plumbing: 12, waterproof: 12 },
     reason: '체력과 담력을 겸비한 당신에게 딱!',
   },
-  // 여성 + 손재주 좋음 + 안전 선호 → 미용/필라 보너스
+  // 여성 + 손재주 좋음 + 안전 선호 → 미용 보너스
   {
     conditions: { gender: 'female', dexterity: 'skilled', danger: 'no' },
-    bonus: { 'beauty-nail': 15, 'pilates-yoga': 10 },
+    bonus: { 'beauty-nail': 15 },
   },
   // 여성 + 서비스 스타일 + 40대 이상 → 요양보호사 보너스
   {
@@ -418,11 +401,11 @@ const comboRules: ComboRule[] = [
     conditions: { age: '30s', status: 'career-change' },
     bonus: { tiling: 10, wallpaper: 10, hvac: 8 },
   },
-  // 체력 약함 + 안전 선호 → 요양/미용/필라 보너스, 기피직 페널티
+  // 체력 약함 + 안전 선호 → 요양/미용 보너스, 기피직 페널티
   {
     conditions: { physical: 'weak', danger: 'no' },
     bonus: {
-      'care-worker': 10, 'beauty-nail': 10, 'pilates-yoga': 10,
+      'care-worker': 10, 'beauty-nail': 10,
       welding: -10, plumbing: -8, waterproof: -10,
     },
   },
@@ -556,15 +539,6 @@ export const resultCopy: Record<string, { catchphrase: string; detailPoints: str
       '1인 샵 창업 가능',
       '트렌드에 민감한 MZ세대 인기',
       '손재주를 살린 창의적 직업',
-    ],
-  },
-  'pilates-yoga': {
-    catchphrase: '건강한 나를 만들면서 돈도 벌 수 있다면?',
-    detailPoints: [
-      'MZ세대 필수 운동 지도자',
-      '건강한 라이프스타일 직업',
-      '스튜디오 창업 가능',
-      '유연한 근무시간',
     ],
   },
 };

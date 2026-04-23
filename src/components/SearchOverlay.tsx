@@ -21,7 +21,7 @@ const searchableTerms: string[] = [
   ...allCourses.map((c) => c.name),
   '국비지원', '내일배움카드', '취업지원', '야간반', '주말반', '속성반',
   '서울', '경기', '부산', '대구', '인천', '대전', '울산',
-  '요양보호사', '한식조리', '지게차', '제과제빵', '네일아트', '필라테스', '용접', '전기',
+  '요양보호사', '지게차', '용접', '전기', '배관', '타일', '도배', '냉동',
 ];
 
 // 중복 제거 + 정렬
@@ -305,7 +305,7 @@ export default function SearchOverlay({
             <div style={{ marginTop: 28 }}>
               <h3 style={{ fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.black, marginBottom: 12 }}>인기 검색어</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {['요양보호사', '지게차', '한식조리', '전기기능사', '국비지원', '필라테스', '제과제빵', '네일아트'].map((term) => (
+                {['요양보호사', '지게차', '전기기능사', '용접기능사', '국비지원', '배관기능사', '타일기능사', '도배기능사'].map((term) => (
                   <button
                     key={term}
                     onClick={() => handleSubmit(term)}

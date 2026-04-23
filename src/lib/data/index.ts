@@ -13,7 +13,6 @@ import * as painting from './painting';
 // 깨끗한 직종
 import * as careWorker from './care-worker';
 import * as beautyNail from './beauty-nail';
-import * as pilatesYoga from './pilates-yoga';
 
 // 카테고리별 데이터 맵
 export const dataByCategory: Record<string, { academies: Academy[]; courses: Course[]; reviews: Review[] }> = {
@@ -28,10 +27,9 @@ export const dataByCategory: Record<string, { academies: Academy[]; courses: Cou
   'painting': painting,
   'care-worker': careWorker,
   'beauty-nail': beautyNail,
-  'pilates-yoga': pilatesYoga,
 };
 
-const allModules = [welding, plumbing, electrician, tiling, wallpaper, hvac, forklift, waterproof, painting, careWorker, beautyNail, pilatesYoga];
+const allModules = [welding, plumbing, electrician, tiling, wallpaper, hvac, forklift, waterproof, painting, careWorker, beautyNail];
 
 // 전체 통합 데이터
 export const allAcademies: Academy[] = allModules.flatMap(m => m.academies);

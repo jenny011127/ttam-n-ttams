@@ -42,8 +42,8 @@ const WORRIES = [
 
 const STEPS = [
   { num: '01', title: '10개 질문에 답해요', desc: '체력, 성격, 목표 등 1분이면 끝나는 간단한 질문' },
-  { num: '02', title: 'TOP 3 자격증을 알려줘요', desc: '적합도 %와 예상 월급까지 한눈에 비교' },
-  { num: '03', title: '집 근처 학원까지', desc: '국비지원 무료 수강 가능한 학원을 바로 확인' },
+  { num: '02', title: '딱 2~3개 자격증만 추려드려요', desc: '적합도 %와 예상 월급까지 한눈에. 10개 비교 말고 집중해서.' },
+  { num: '03', title: '내일배움카드로 무료 수강', desc: '집 근처 국비지원 학원까지 바로 확인' },
 ];
 
 // 지역 질문은 collect에서 받으므로 테스트에서 제외
@@ -211,7 +211,7 @@ function LandingContent() {
   useEffect(() => {
     if (step !== 'splash') return;
     setSplashReady(false);
-    const timer = setTimeout(() => setSplashReady(true), 2000);
+    const timer = setTimeout(() => setSplashReady(true), 1200);
     return () => clearTimeout(timer);
   }, [step]);
 
@@ -250,7 +250,19 @@ function LandingContent() {
 
   const handleStart = () => {
     trackEvent('lp_test_start', { page: '/landing' });
-    setStep('collect');
+    setStep('test');
+    setCurrentQ(0);
+    window.scrollTo(0, 0);
+  };
+
+  // intro에서 Q1 인라인 선택 → 바로 test 단계로 진입 (Q2부터)
+  const handleInlineFirstAnswer = (optionId: string) => {
+    const firstQ = testQuestions[0];
+    const newAnswers = { ...answers, [firstQ.id]: optionId };
+    setAnswers(newAnswers);
+    trackEvent('lp_test_start', { page: '/landing', eventData: { inline: true } });
+    setStep('test');
+    setCurrentQ(1);
     window.scrollTo(0, 0);
   };
 
@@ -283,8 +295,7 @@ function LandingContent() {
 
     trackEvent('lp_collect_submit', { page: '/landing', eventData: { region } });
     setSaving(false);
-    setStep('test');
-    setCurrentQ(0);
+    setStep('result');
     window.scrollTo(0, 0);
   };
 
@@ -302,9 +313,9 @@ function LandingContent() {
         setTimeout(() => setAnimDir(null), 300);
       }, 200);
     } else {
-      // 테스트 완료 → 바로 결과
+      // 테스트 완료 → 결과 게이트 (이름/전화번호/지역)
       trackEvent('lp_test_complete', { page: '/landing', eventData: { answers: newAnswers } });
-      setStep('result');
+      setStep('collect');
       window.scrollTo(0, 0);
     }
   }, [currentQ, total, answers]);
@@ -318,7 +329,7 @@ function LandingContent() {
         setTimeout(() => setAnimDir(null), 300);
       }, 200);
     } else {
-      setStep('collect');
+      setStep('intro');
     }
   };
 
@@ -355,17 +366,18 @@ function LandingContent() {
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               background: `${colors['orange-40']}12`,
-              borderRadius: 100, padding: '6px 16px', marginBottom: 24,
+              borderRadius: 100, padding: '6px 16px', marginBottom: 20,
               fontSize: 13, fontWeight: 600, color: colors['orange-40'],
             }}>
               <Sparkles size={14} />
-              무료 · 1분 소요 · 10개 질문
+              무료 · 1분 · 10개 질문
             </div>
 
             <h1 className="lp-hero-title" style={{
-              fontWeight: 900, lineHeight: 1.4, letterSpacing: -0.5, marginBottom: 6, color: '#141517',
+              fontWeight: 900, lineHeight: 1.3, letterSpacing: -0.5, marginBottom: 24, color: '#141517',
             }}>
-              나에게 맞는 자격증은<br />
+              <span style={{ color: colors['orange-40'] }}>내일배움카드</span>로<br />
+              뭘 배울지 모르겠다면?<br />
               <span style={{
                 color: colors['orange-40'],
                 display: 'inline-block', minWidth: '5em',
@@ -375,28 +387,86 @@ function LandingContent() {
               }}>
                 {ROLLING_CERTS[certIdx]}
               </span>
-              ?
             </h1>
 
-            <p className="lp-hero-desc" style={{ color: '#727883', lineHeight: 1.6 }}>
-              체력, 성격, 목표에 맞춰 분석해서<br />
-              딱 맞는 자격증 + 집 근처 학원까지 알려드려요.
-            </p>
+            {/* ─── Q1 카드 위 배너 (확인 사살) ─── */}
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: 10,
+              background: `linear-gradient(135deg, ${colors['orange-40']}10, ${colors['orange-40']}04)`,
+              border: `1px solid ${colors['orange-40']}25`,
+              borderRadius: 14, padding: '14px 16px', marginBottom: 14,
+              textAlign: 'left',
+            }}>
+              <span style={{ fontSize: 20, lineHeight: 1, flexShrink: 0, marginTop: 2 }}>💰</span>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#141517', lineHeight: 1.4, marginBottom: 2 }}>
+                  추천 자격증, 전부 <span style={{ color: colors['orange-40'] }}>무료 수강 가능</span>
+                </p>
+                <p style={{ fontSize: 12, color: '#727883', lineHeight: 1.5 }}>
+                  내일배움카드 없어도 괜찮아요. 발급 가이드까지 안내해드려요.
+                </p>
+              </div>
+            </div>
 
-            <div className="lp-hero-cta" ref={heroCtaRef} style={{ marginTop: 32 }}>
-              <button
-                onClick={handleStart}
-                className="press lp-hero-btn"
-                style={{
-                  width: '100%',
-                  borderRadius: 16, border: 'none',
-                  background: colors['orange-40'],
-                  fontWeight: 700,
-                  color: '#fff', cursor: 'pointer',
-                }}
-              >
-                무료로 테스트 시작하기
-              </button>
+            {/* ─── 인라인 Q1 (바로 시작) ─── */}
+            <div ref={heroCtaRef} style={{
+              background: '#fff',
+              borderRadius: 20,
+              padding: '24px 20px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
+              textAlign: 'left',
+            }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                fontSize: 11, fontWeight: 700, color: colors['orange-40'],
+                marginBottom: 10,
+              }}>
+                Q1 <span style={{ color: '#B2B8C0', fontWeight: 500 }}>/ 10</span>
+              </div>
+              <h2 style={{
+                fontSize: 19, fontWeight: 800, color: '#141517',
+                lineHeight: 1.4, marginBottom: 4,
+              }}>
+                {testQuestions[0].question}
+              </h2>
+              {testQuestions[0].subtitle && (
+                <p style={{ fontSize: 14, color: '#727883', marginBottom: 16 }}>
+                  {testQuestions[0].subtitle}
+                </p>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
+                {testQuestions[0].options.map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => handleInlineFirstAnswer(opt.id)}
+                    className="press"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      width: '100%', padding: '16px 18px',
+                      borderRadius: 14, border: '2px solid #F3F4F6',
+                      background: '#fff', cursor: 'pointer',
+                      fontSize: 16, fontWeight: 600, color: '#141517',
+                      textAlign: 'left', transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = colors['orange-40'];
+                      e.currentTarget.style.background = `${colors['orange-40']}06`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = '#F3F4F6';
+                      e.currentTarget.style.background = '#fff';
+                    }}
+                  >
+                    <span>{opt.label}</span>
+                    <ChevronRight size={18} color="#B2B8C0" />
+                  </button>
+                ))}
+              </div>
+
+              <p style={{ fontSize: 11, color: '#B2B8C0', textAlign: 'center', marginTop: 14, lineHeight: 1.5 }}>
+                선택하면 자동으로 다음 질문으로 · 이 달 1,247명 참여
+              </p>
             </div>
           </div>
         </section>
@@ -478,10 +548,10 @@ function LandingContent() {
           <div className="lp-section-inner">
             <div className="lp-trust-grid">
               {[
-                { label: '테스트 비용', value: '무료', sub: '회원가입도 필요 없어요' },
+                { label: '테스트 비용', value: '무료', sub: '전화 오지 않아요' },
                 { label: '소요 시간', value: '약 1분', sub: '10개 질문이면 끝' },
-                { label: '추천 자격증', value: 'TOP 3', sub: '적합도 %까지 분석' },
-                { label: '학원 추천', value: '지역별', sub: '국비지원 학원 포함' },
+                { label: '추천 결과', value: 'TOP 3', sub: '적합도 %까지 분석' },
+                { label: '학원 수강료', value: '최대 무료', sub: '내일배움카드 적용 시' },
               ].map((item, i) => (
                 <div key={i} style={{
                   padding: '20px 16px',
@@ -501,6 +571,58 @@ function LandingContent() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ─── 포용 섹션 (누가 올 수 있냐고요?) ─── */}
+        <section className="lp-section" style={{ background: '#141517', color: '#fff' }}>
+          <div className="lp-section-inner">
+            <p className="lp-target-label" style={{
+              fontWeight: 700, color: colors['orange-40'], marginBottom: 10,
+            }}>
+              누가 올 수 있냐고요?
+            </p>
+            <h2 className="lp-target-heading" style={{
+              fontWeight: 900, lineHeight: 1.4, marginBottom: 24, color: '#fff',
+            }}>
+              내일배움카드,<br />생각보다 훨씬 많은 사람이 됩니다.
+            </h2>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                '재직자 OK',
+                '전업주부 OK',
+                '자영업 폐업하신 분 OK',
+                '공시 끝내신 분 OK',
+                '고졸 취업자 OK',
+                '쉬었음 청년 OK',
+                'AI에 맞설 사람 OK',
+              ].map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '14px 18px', borderRadius: 14,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: '50%',
+                    background: colors['orange-40'],
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <Check size={13} color="#fff" strokeWidth={3} />
+                  </div>
+                  <span style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{item}</span>
+                </div>
+              ))}
+            </div>
+
+            <p style={{
+              fontSize: 13, color: 'rgba(255,255,255,0.6)',
+              marginTop: 20, lineHeight: 1.6, textAlign: 'center',
+            }}>
+              * 만 15세 이상 대한민국 국민 대부분이 신청 가능해요
+            </p>
           </div>
         </section>
 
@@ -591,9 +713,8 @@ function LandingContent() {
         {/* ─── 하단 고정 CTA ─── */}
         <div className="lp-fixed-bar" style={{
           position: 'fixed', bottom: 0, left: '50%',
-          padding: '12px 20px',
-          paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
-          background: 'linear-gradient(transparent, #fff 30%)',
+          padding: '16px 16px',
+          paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
           transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s',
           transform: showSticky ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(100%)',
           opacity: showSticky ? 1 : 0,
@@ -604,11 +725,12 @@ function LandingContent() {
             className="press lp-fixed-btn"
             style={{
               width: '100%',
-              borderRadius: 16, border: 'none',
+              borderRadius: 999, border: 'none',
               background: colors['orange-40'],
               fontWeight: 700,
               color: '#fff', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              boxShadow: `0 12px 32px ${colors['orange-40']}55, 0 2px 8px rgba(0,0,0,0.12)`,
             }}
           >
             나에게 맞는 자격증 찾기 <ArrowRight size={18} />
@@ -628,24 +750,32 @@ function LandingContent() {
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px', gap: 12 }}>
-          <button onClick={() => setStep('intro')}
+          <button onClick={() => setStep('test')}
             style={{ background: 'none', border: 'none', padding: 4, cursor: 'pointer', display: 'flex' }}>
             <ArrowLeft size={22} color="#141517" />
           </button>
           <span style={{ fontSize: 15, fontWeight: 600, color: '#141517' }}>
-            시작하기
+            결과 확인
           </span>
         </div>
 
         <div className="lp-collect-section">
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: `${colors['orange-40']}12`,
+            borderRadius: 100, padding: '6px 14px', marginBottom: 16,
+            fontSize: 12, fontWeight: 700, color: colors['orange-40'],
+          }}>
+            <Check size={12} /> 테스트 완료
+          </div>
           <h2 className="lp-collect-title" style={{
             fontWeight: 900, color: '#141517', lineHeight: 1.4,
             letterSpacing: -0.5, marginBottom: 8,
           }}>
-            먼저 간단한 정보만<br />알려주세요
+            결과가 준비됐어요<br />어디로 보내드릴까요?
           </h2>
           <p style={{ fontSize: 15, color: '#727883', lineHeight: 1.5, marginBottom: 32 }}>
-            맞춤 자격증 추천과 학원 안내를 위해 필요해요.
+            TOP 3 자격증과 집 근처 학원까지,<br />결과를 저장하고 바로 확인하세요.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
@@ -695,13 +825,14 @@ function LandingContent() {
             background: saving ? '#B2B8C0' : colors['orange-40'],
             fontSize: 17, fontWeight: 700, color: '#fff',
             cursor: saving ? 'default' : 'pointer',
-            boxShadow: `0 8px 24px ${colors['orange-40']}30`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}>
-            {saving ? '저장 중...' : '테스트 시작하기'}
+            {saving ? '저장 중...' : <>내 결과 보러가기 <ArrowRight size={18} /></>}
           </button>
 
           <p style={{ fontSize: 11, color: '#B2B8C0', textAlign: 'center', marginTop: 12, lineHeight: 1.5 }}>
-            입력하신 정보는 맞춤 학원 안내 목적으로만 사용되며,<br />외부에 제공하지 않습니다.
+            전화 오지 않아요. 카톡/문자로만 안내해요.<br />
+            입력 정보는 맞춤 학원 안내에만 사용되며 외부 제공하지 않습니다.
           </p>
         </div>
       </div>
@@ -823,9 +954,11 @@ function LandingContent() {
 
     return (
       <div className="lp-page" style={{
-        background: '#141517', color: '#fff',
+        background: `linear-gradient(180deg, ${colors['orange-40']} 0%, ${colors['orange-60']} 100%)`,
+        color: '#fff',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh',
       }}>
         <style>{RESPONSIVE_CSS}</style>
         <style>{`
@@ -835,25 +968,26 @@ function LandingContent() {
 
         {/* 브랜드 로고 */}
         <div style={{
-          animation: 'splashFadeIn 0.8s ease-out',
+          animation: 'splashFadeIn 0.6s ease-out',
           textAlign: 'center',
-          marginBottom: splashReady ? 48 : 0,
-          transition: 'margin-bottom 0.5s ease',
+          marginBottom: splashReady ? 32 : 0,
+          transition: 'margin-bottom 0.4s ease',
         }}>
           <div style={{
-            width: 80, height: 80, borderRadius: 24,
-            background: `linear-gradient(135deg, ${colors['orange-40']}, ${colors['orange-60']})`,
+            width: 72, height: 72, borderRadius: 22,
+            background: 'rgba(255,255,255,0.18)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 20px',
-            boxShadow: `0 16px 48px ${colors['orange-40']}40`,
+            margin: '0 auto 16px',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.25)',
           }}>
-            <Sparkles size={36} color="#fff" />
+            <Sparkles size={32} color="#fff" />
           </div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.5, marginBottom: 8 }}>
-            땀앤땀스
+          <h1 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6, color: '#fff' }}>
+            {name || '당신'}님의 결과를 저장하고 있어요
           </h1>
-          <p style={{ fontSize: 15, color: '#727883' }}>
-            자격증 학원 비교 플랫폼
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)' }}>
+            곧 맞춤 학원을 보여드릴게요
           </p>
         </div>
 
@@ -864,16 +998,16 @@ function LandingContent() {
             width: '100%', maxWidth: 380, padding: '0 24px',
           }}>
             <div style={{
-              background: 'rgba(255,255,255,0.06)',
+              background: 'rgba(255,255,255,0.12)',
               borderRadius: 20, padding: '28px 24px',
-              border: '1px solid rgba(255,255,255,0.1)',
-              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(16px)',
             }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, textAlign: 'center' }}>
-                회원가입
+              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, textAlign: 'center', color: '#fff' }}>
+                결과 저장하기
               </h2>
-              <p style={{ fontSize: 13, color: '#727883', marginBottom: 24, textAlign: 'center' }}>
-                가입하면 맞춤 학원 추천을 받을 수 있어요
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 24, textAlign: 'center' }}>
+                아이디 하나면 언제든 다시 확인할 수 있어요
               </p>
 
               {/* 이름/전화번호 (이미 입력됨) */}
@@ -932,21 +1066,22 @@ function LandingContent() {
 
               <button onClick={handleSignup} disabled={signupLoading} className="press" style={{
                 width: '100%', padding: '15px 0', borderRadius: 12, border: 'none',
-                background: signupLoading ? '#727883' : colors['orange-40'],
-                fontSize: 16, fontWeight: 700, color: '#fff',
+                background: signupLoading ? 'rgba(255,255,255,0.3)' : '#fff',
+                fontSize: 16, fontWeight: 700,
+                color: signupLoading ? 'rgba(255,255,255,0.7)' : colors['orange-40'],
                 cursor: signupLoading ? 'default' : 'pointer',
-                boxShadow: `0 6px 20px ${colors['orange-40']}25`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}>
-                {signupLoading ? '가입 중...' : '가입하고 학원 보기'}
+                {signupLoading ? '저장 중...' : <>결과 저장하고 학원 보기 <ArrowRight size={16} /></>}
               </button>
 
               <button onClick={() => router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`)}
                 style={{
                   width: '100%', padding: '12px 0', marginTop: 10,
                   background: 'none', border: 'none',
-                  fontSize: 14, color: '#727883', cursor: 'pointer',
+                  fontSize: 14, color: 'rgba(255,255,255,0.7)', cursor: 'pointer',
                 }}>
-                나중에 할게요
+                먼저 학원부터 둘러보기 →
               </button>
             </div>
           </div>
@@ -1100,9 +1235,9 @@ function LandingContent() {
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '16px 0', borderRadius: 14, border: 'none',
             background: colors['orange-40'], fontSize: 16, fontWeight: 700, color: '#fff',
-            cursor: 'pointer', boxShadow: `0 6px 20px ${colors['orange-40']}30`,
+            cursor: 'pointer',
           }}>
-          무료 수강 학원 보기 <ArrowRight size={18} />
+          내 학원 보러 가기 <ArrowRight size={18} />
         </button>
       </div>
     </div>

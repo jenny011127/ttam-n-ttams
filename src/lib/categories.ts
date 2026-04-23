@@ -91,12 +91,4 @@ export const categories: Category[] = [
     description: '뷰티 업계 국가자격증. 실기 학원 필수',
     academyCount: 4,
   },
-  {
-    id: 'pilates-yoga',
-    name: '필라테스/요가',
-    icon: 'Dumbbell',
-    color: '#10B981',
-    description: 'MZ세대 인기 자격증. 지도자 과정',
-    academyCount: 5,
-  },
 ];
