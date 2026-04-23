@@ -728,12 +728,25 @@ function LandingContent() {
           </div>
           <h2 className="lp-collect-title" style={{
             fontWeight: 900, color: '#141517', lineHeight: 1.4,
-            letterSpacing: -0.5, marginBottom: 8,
+            letterSpacing: -0.5, marginBottom: 12,
           }}>
-            결과가 준비됐어요<br />어디로 보내드릴까요?
+            결과가 나왔어요!<br />맞춤 학원까지 받으려면
           </h2>
-          <p style={{ fontSize: 15, color: '#727883', lineHeight: 1.5, marginBottom: 32 }}>
-            TOP 3 자격증과 집 근처 학원까지,<br />결과를 저장하고 바로 확인하세요.
+          <div style={{
+            padding: '12px 14px', borderRadius: 12,
+            background: '#F8F9FA',
+            border: '1px solid #F3F4F6',
+            marginBottom: 24,
+          }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#141517', lineHeight: 1.5, marginBottom: 4 }}>
+              📋 결과로 받는 것
+            </p>
+            <p style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.55 }}>
+              TOP 3 자격증 · 집 근처 학원 · 국비 무료 수강 여부
+            </p>
+          </div>
+          <p style={{ fontSize: 14, color: '#727883', lineHeight: 1.5, marginBottom: 24 }}>
+            이름·연락처·지역만 알려주시면 바로 공개해드릴게요.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
@@ -788,10 +801,17 @@ function LandingContent() {
             {saving ? '저장 중...' : <>내 결과 보러가기 <ArrowRight size={18} /></>}
           </button>
 
-          <p style={{ fontSize: 11, color: '#B2B8C0', textAlign: 'center', marginTop: 12, lineHeight: 1.5 }}>
-            전화 오지 않아요. 카톡/문자로만 안내해요.<br />
-            입력 정보는 맞춤 학원 안내에만 사용되며 외부 제공하지 않습니다.
-          </p>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: '#F8F9FA',
+            border: '1px solid #F3F4F6',
+            borderRadius: 100, padding: '8px 14px',
+            marginTop: 14,
+            fontSize: 12, fontWeight: 600, color: '#4B5563',
+          }}>
+            <span className="tossface" style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
+            전화 오지 않아요 · 카톡으로만 · 외부 제공 X
+          </div>
         </div>
       </div>
     );
