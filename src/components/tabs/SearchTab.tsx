@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Search, MapPin, ChevronDown } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { categories } from '@/lib/categories';
 import { allAcademies, getAcademiesByCategory } from '@/lib/data';
 import AcademyCard from '@/components/shared/AcademyCard';
+import RegionSheet from '@/components/RegionSheet';
+import { getKeywordsForRegionId, getLabelForRegionId, mapLandingRegionToId } from '@/lib/regions';
 import type { Academy } from '@/types';
 
 type SortKey = 'recommend' | 'passRate' | 'rating' | 'review';
@@ -31,19 +33,31 @@ export default function SearchTab({
   onAcademySelect,
   initialCategory,
   initialQuery,
+  initialRegion,
 }: {
   onAcademySelect: (id: string) => void;
   initialCategory?: string;
   initialQuery?: string;
+  initialRegion?: string;
 }) {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || '');
   const [sort, setSort] = useState<SortKey>('recommend');
   const [govOnly, setGovOnly] = useState(false);
   const [searchText, setSearchText] = useState(initialQuery || '');
+  const [regionId, setRegionId] = useState<string>(() => mapLandingRegionToId(initialRegion || null));
+  const [regionSheetOpen, setRegionSheetOpen] = useState(false);
 
   let filtered = selectedCategory
     ? getAcademiesByCategory(selectedCategory)
     : allAcademies;
+
+  // 지역 필터
+  const regionKeywords = getKeywordsForRegionId(regionId);
+  if (regionKeywords.length > 0) {
+    filtered = filtered.filter((a) =>
+      regionKeywords.some(kw => a.addressShort.includes(kw))
+    );
+  }
 
   if (govOnly) {
     filtered = filtered.filter((a) => a.isGovernmentFunded);
@@ -63,6 +77,23 @@ export default function SearchTab({
 
   return (
     <div style={{ paddingBottom: 80 }}>
+      {/* Region Selector (당근 스타일) */}
+      <div style={{ padding: '4px 20px 10px' }}>
+        <button
+          onClick={() => setRegionSheetOpen(true)}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: 'none', border: 'none', cursor: 'pointer',
+            padding: '6px 4px',
+            fontSize: 17, fontWeight: fontWeight.bold, color: colors.black,
+          }}
+        >
+          <MapPin size={18} color={colors['orange-40']} />
+          {getLabelForRegionId(regionId)}
+          <ChevronDown size={16} color={colors['gray-60']} />
+        </button>
+      </div>
+
       {/* Search Bar */}
       <div style={{ padding: '0 20px 12px' }}>
         <div
@@ -92,6 +123,15 @@ export default function SearchTab({
           />
         </div>
       </div>
+
+      {/* Region Sheet */}
+      <RegionSheet
+        open={regionSheetOpen}
+        selectedRegionId={regionId}
+        onClose={() => setRegionSheetOpen(false)}
+        onSelect={(id) => setRegionId(id)}
+      />
+
 
       {/* Category Chips */}
       <div className="hscroll" style={{ display: 'flex', gap: 8, padding: '0 20px 12px' }}>

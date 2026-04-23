@@ -16,6 +16,7 @@ function MainPageContent() {
   const searchParams = useSearchParams();
   const urlTab = searchParams.get('tab');
   const urlCategory = searchParams.get('category');
+  const urlRegion = searchParams.get('region');
 
   const [showSplash, setShowSplash] = useState(!urlTab);
   const [appReady, setAppReady] = useState(!!urlTab);
@@ -79,6 +80,7 @@ function MainPageContent() {
                 onAcademySelect={handleAcademySelect}
                 initialCategory={searchCategory}
                 initialQuery={searchQuery}
+                initialRegion={urlRegion || undefined}
               />
             )}
             {activeTab === 'ranking' && (
