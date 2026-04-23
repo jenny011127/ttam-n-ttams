@@ -379,7 +379,7 @@ function LandingContent() {
               textAlign: 'left',
               boxShadow: `0 4px 16px ${colors.navy}30`,
             }}>
-              <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>💰</span>
+              <span className="tossface" style={{ fontSize: 24, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>💰</span>
               <div>
                 <p style={{ fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.4, marginBottom: 4 }}>
                   추천 자격증, 전부 <span style={{ color: colors['orange-40'] }}>국비 무료 수강 가능</span>
@@ -407,7 +407,7 @@ function LandingContent() {
                   fontSize: 13, fontWeight: 700, color: colors['orange-40'],
                   marginBottom: 6,
                 }}>
-                  ✋ 잠깐, 질문 하나만 먼저 할게요
+                  <span className="tossface">✋</span> 잠깐, 질문 하나만 먼저 할게요
                 </p>
                 <p style={{
                   fontSize: 13, color: '#4B5563', lineHeight: 1.55,

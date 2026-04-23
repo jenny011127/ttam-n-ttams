@@ -52,6 +52,11 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+/* 토스페이스 이모지 */
+.tossface {
+  font-family: 'Tossface', 'Pretendard Variable', sans-serif;
+}
+
 .app-shell {
   max-width: 430px;
   margin: 0 auto;
