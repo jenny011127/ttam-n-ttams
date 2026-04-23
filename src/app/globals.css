@@ -13,12 +13,12 @@
   --color-card: #FFFFFF;
   --color-navy: #1B202C;
   --color-black: #1D1D1D;
-  --color-orange-60: #20417E;
-  --color-orange-50: #37558D;
-  --color-orange-40: #5974A8;
-  --color-orange-30: #78A2CC;
-  --color-orange-20: #A5D1E6;
-  --color-orange-10: #C4E8F6;
+  --color-orange-60: #0D47A1;
+  --color-orange-50: #1565C0;
+  --color-orange-40: #2196F3;
+  --color-orange-30: #42A5F5;
+  --color-orange-20: #90CAF9;
+  --color-orange-10: #E3F2FD;
   --color-gray-90: #5A5E66;
   --color-gray-60: #AEB3BC;
   --color-gray-40: #C5C8CE;
@@ -117,8 +117,8 @@ body {
 }
 
 @keyframes floatPulse {
-  0%, 100% { transform: translateY(0); box-shadow: 0 4px 16px rgba(89,116,168,0.35); }
-  50% { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(89,116,168,0.45); }
+  0%, 100% { transform: translateY(0); box-shadow: 0 4px 16px rgba(33,150,243,0.35); }
+  50% { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(33,150,243,0.45); }
 }
 .float-pulse {
   animation: floatPulse 2.5s ease-in-out infinite;
@@ -226,7 +226,7 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #5974A8;
+  background: #2196F3;
   position: absolute;
   bottom: -3px;
   left: 50%;
@@ -246,7 +246,7 @@ body {
   top: -1px;
   height: 2px;
   width: 32px;
-  background: #5974A8;
+  background: #2196F3;
   border-radius: 0 0 2px 2px;
   transition: left 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
