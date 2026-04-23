@@ -55,14 +55,14 @@ export default function RegionSheet({ open, selectedRegionId, onClose, onSelect 
       <div
         onClick={onClose}
         style={{
-          position: 'fixed', inset: 0, zIndex: 100,
-          background: 'rgba(0,0,0,0.4)',
+          position: 'fixed', inset: 0, zIndex: 9998,
+          background: 'rgba(0,0,0,0.45)',
           animation: 'fadeIn 0.2s ease-out',
         }}
       />
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
       `}</style>
 
       {/* Bottom Sheet */}
@@ -72,10 +72,11 @@ export default function RegionSheet({ open, selectedRegionId, onClose, onSelect 
         width: '100%', maxWidth: 430,
         background: '#fff',
         borderRadius: '20px 20px 0 0',
-        zIndex: 101,
+        zIndex: 9999,
         maxHeight: '85vh',
         display: 'flex', flexDirection: 'column',
         animation: 'slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        boxShadow: '0 -8px 32px rgba(0,0,0,0.12)',
       }}>
         {/* Header */}
         <div style={{
