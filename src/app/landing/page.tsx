@@ -926,7 +926,7 @@ function LandingContent() {
 
     return (
       <div className="lp-page" style={{
-        background: `linear-gradient(180deg, ${colors['orange-40']} 0%, ${colors['orange-60']} 100%)`,
+        background: `linear-gradient(180deg, #5974A8 0%, #78A2CC 60%, #A5D1E6 100%)`,
         color: '#fff',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -938,28 +938,25 @@ function LandingContent() {
           @keyframes splashSlideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         `}</style>
 
-        {/* 브랜드 로고 */}
+        {/* 상단 축하 영역 */}
         <div style={{
           animation: 'splashFadeIn 0.6s ease-out',
           textAlign: 'center',
-          marginBottom: splashReady ? 32 : 0,
+          marginBottom: splashReady ? 24 : 0,
           transition: 'margin-bottom 0.4s ease',
+          padding: '0 24px',
         }}>
           <div style={{
-            width: 72, height: 72, borderRadius: 22,
-            background: 'rgba(255,255,255,0.18)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 16px',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.25)',
+            fontSize: 56, marginBottom: 14, lineHeight: 1,
           }}>
-            <Sparkles size={32} color="#fff" />
+            <span className="tossface">🎉</span>
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 6, color: '#fff' }}>
-            {name || '당신'}님의 결과를 저장하고 있어요
+          <h1 style={{ fontSize: 23, fontWeight: 900, letterSpacing: -0.5, marginBottom: 10, color: '#fff', lineHeight: 1.35 }}>
+            {name || '당신'}님,<br />여기까지 오신 것만으로 대단해요
           </h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)' }}>
-            곧 맞춤 학원을 보여드릴게요
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.92)', lineHeight: 1.55 }}>
+            '어떻게 시작해야 하지?' 고민은 이제 그만.<br />
+            <b>하나부터 열까지, 저희가 옆에서 도와드릴게요.</b>
           </p>
         </div>
 
@@ -970,33 +967,54 @@ function LandingContent() {
             width: '100%', maxWidth: 380, padding: '0 24px',
           }}>
             <div style={{
-              background: 'rgba(255,255,255,0.12)',
-              borderRadius: 20, padding: '28px 24px',
-              border: '1px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(16px)',
+              background: 'rgba(255,255,255,0.97)',
+              borderRadius: 20, padding: '26px 22px',
+              boxShadow: '0 12px 40px rgba(32,65,126,0.25)',
             }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, textAlign: 'center', color: '#fff' }}>
-                결과 저장하기
+              <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 6, textAlign: 'center', color: '#141517' }}>
+                첫걸음, 같이 시작해요
               </h2>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 24, textAlign: 'center' }}>
-                아이디 하나면 언제든 다시 확인할 수 있어요
+              <p style={{ fontSize: 13, color: '#727883', marginBottom: 18, textAlign: 'center', lineHeight: 1.55 }}>
+                가입만 하시면, 다음 단계부터는<br />
+                저희가 차근차근 안내해드릴게요.
               </p>
 
+              {/* 약속 체크리스트 */}
+              <div style={{
+                background: '#F8F9FA',
+                borderRadius: 12, padding: '14px 14px',
+                marginBottom: 18,
+              }}>
+                {[
+                  { emoji: '💳', text: '내일배움카드 신청 방법' },
+                  { emoji: '🏫', text: '나에게 맞는 학원 매칭' },
+                  { emoji: '💬', text: '수강신청까지 카톡 상담' },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '5px 0',
+                  }}>
+                    <span className="tossface" style={{ fontSize: 16, lineHeight: 1 }}>{item.emoji}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#141517' }}>{item.text}</span>
+                  </div>
+                ))}
+              </div>
+
               {/* 이름/전화번호 (이미 입력됨) */}
-              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
                 <div style={{
-                  flex: 1, padding: '12px 14px',
-                  background: 'rgba(255,255,255,0.05)', borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  fontSize: 14, color: '#727883',
+                  flex: 1, padding: '11px 14px',
+                  background: '#F8F9FA', borderRadius: 10,
+                  border: '1px solid #F3F4F6',
+                  fontSize: 13, color: '#727883',
                 }}>
                   {name || '이름'}
                 </div>
                 <div style={{
-                  flex: 1, padding: '12px 14px',
-                  background: 'rgba(255,255,255,0.05)', borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  fontSize: 14, color: '#727883',
+                  flex: 1, padding: '11px 14px',
+                  background: '#F8F9FA', borderRadius: 10,
+                  border: '1px solid #F3F4F6',
+                  fontSize: 13, color: '#727883',
                 }}>
                   {phone || '전화번호'}
                 </div>
@@ -1005,30 +1023,30 @@ function LandingContent() {
               {/* 아이디 */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
-                background: 'rgba(255,255,255,0.08)', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.12)', marginBottom: 10,
+                background: '#F8F9FA', borderRadius: 10,
+                border: '1px solid #F3F4F6', marginBottom: 10,
               }}>
-                <User size={16} color="#727883" />
+                <User size={16} color="#B2B8C0" />
                 <input type="text" placeholder="아이디 (4자 이상)" value={signupId}
                   onChange={e => setSignupId(e.target.value)}
                   style={{
                     flex: 1, border: 'none', background: 'transparent',
-                    fontSize: 15, color: '#fff', outline: 'none',
+                    fontSize: 15, color: '#141517', outline: 'none',
                   }} />
               </div>
 
               {/* 비밀번호 */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
-                background: 'rgba(255,255,255,0.08)', borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.12)', marginBottom: 16,
+                background: '#F8F9FA', borderRadius: 10,
+                border: '1px solid #F3F4F6', marginBottom: 16,
               }}>
-                <Check size={16} color="#727883" />
+                <Check size={16} color="#B2B8C0" />
                 <input type="password" placeholder="비밀번호 (6자 이상)" value={signupPw}
                   onChange={e => setSignupPw(e.target.value)}
                   style={{
                     flex: 1, border: 'none', background: 'transparent',
-                    fontSize: 15, color: '#fff', outline: 'none',
+                    fontSize: 15, color: '#141517', outline: 'none',
                   }} />
               </div>
 
@@ -1038,20 +1056,21 @@ function LandingContent() {
 
               <button onClick={handleSignup} disabled={signupLoading} className="press" style={{
                 width: '100%', padding: '15px 0', borderRadius: 12, border: 'none',
-                background: signupLoading ? 'rgba(255,255,255,0.3)' : '#fff',
+                background: signupLoading ? '#B2B8C0' : colors['orange-40'],
                 fontSize: 16, fontWeight: 700,
-                color: signupLoading ? 'rgba(255,255,255,0.7)' : colors['orange-40'],
+                color: '#fff',
                 cursor: signupLoading ? 'default' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                boxShadow: `0 6px 20px ${colors['orange-40']}40`,
               }}>
-                {signupLoading ? '저장 중...' : <>결과 저장하고 학원 보기 <ArrowRight size={16} /></>}
+                {signupLoading ? '가입 중...' : <>가입하고 안내 받기 <ArrowRight size={16} /></>}
               </button>
 
               <button onClick={() => router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`)}
                 style={{
                   width: '100%', padding: '12px 0', marginTop: 10,
                   background: 'none', border: 'none',
-                  fontSize: 14, color: 'rgba(255,255,255,0.7)', cursor: 'pointer',
+                  fontSize: 13, color: '#727883', cursor: 'pointer',
                 }}>
                 먼저 학원부터 둘러보기 →
               </button>

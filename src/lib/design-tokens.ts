@@ -5,14 +5,15 @@
  */
 
 // ─── Colors ───
+// ⚠️ 키 이름은 orange-XX 유지 (레거시 호환). 실제 값은 블루 스케일.
 export const colors = {
-  // Orange scale
-  'orange-60': '#E81B0E',
-  'orange-50': '#F73418',
-  'orange-40': '#F9502E',  // Key Color
-  'orange-30': '#FC9475',
-  'orange-20': '#FDC0AB',
-  'orange-10': '#FFE1D5',
+  // Blue scale (키 이름은 orange- 유지)
+  'orange-60': '#20417E',  // Bay of Many (darkest)
+  'orange-50': '#37558D',  // Chambray
+  'orange-40': '#5974A8',  // Waikawa Gray (Key Color, PRIMARY)
+  'orange-30': '#78A2CC',  // Dark Pastel Blue
+  'orange-20': '#A5D1E6',  // Pastel Blue
+  'orange-10': '#C4E8F6',  // Tropical Blue (lightest)
 
   // Gray scale
   'gray-90': '#5A5E66',
@@ -88,7 +89,7 @@ export const shadows = {
 
 // ─── Gradients ───
 export const gradients = {
-  orange: 'linear-gradient(135deg, #F9502E, #FC9475)',
+  orange: 'linear-gradient(135deg, #5974A8, #78A2CC)', // 블루로 교체, 키 유지
   navy: 'linear-gradient(135deg, #1B202C, #2D3748)',
   government: 'linear-gradient(135deg, #3B82F6, #60A5FA)',
   header: 'rgba(255,255,255,0.95)',
