@@ -718,19 +718,11 @@ function LandingContent() {
         </div>
 
         <div className="lp-collect-section">
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            background: `${colors['orange-40']}12`,
-            borderRadius: 100, padding: '6px 14px', marginBottom: 16,
-            fontSize: 12, fontWeight: 700, color: colors['orange-40'],
-          }}>
-            <Check size={12} /> 테스트 완료
-          </div>
           <h2 className="lp-collect-title" style={{
             fontWeight: 900, color: '#141517', lineHeight: 1.4,
             letterSpacing: -0.5, marginBottom: 12,
           }}>
-            결과가 나왔어요!<br />맞춤 학원까지 받으려면
+            결과가 나왔어요!<br />아래의 정보를 입력하고<br />맞춤학원까지 알아봐요
           </h2>
           <div style={{
             padding: '12px 14px', borderRadius: 12,
@@ -738,16 +730,14 @@ function LandingContent() {
             border: '1px solid #F3F4F6',
             marginBottom: 24,
           }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#141517', lineHeight: 1.5, marginBottom: 4 }}>
-              📋 결과로 받는 것
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#141517', lineHeight: 1.5, marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span className="tossface" style={{ fontSize: 15, lineHeight: 1 }}>📋</span>
+              결과로 받는 것
             </p>
             <p style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.55 }}>
               TOP 3 자격증 · 집 근처 학원 · 국비 무료 수강 여부
             </p>
           </div>
-          <p style={{ fontSize: 14, color: '#727883', lineHeight: 1.5, marginBottom: 24 }}>
-            이름·연락처·지역만 알려주시면 바로 공개해드릴게요.
-          </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
             <div style={{
@@ -802,15 +792,19 @@ function LandingContent() {
           </button>
 
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: '#F8F9FA',
-            border: '1px solid #F3F4F6',
-            borderRadius: 100, padding: '8px 14px',
+            display: 'flex', justifyContent: 'center',
             marginTop: 14,
-            fontSize: 12, fontWeight: 600, color: '#4B5563',
           }}>
-            <span className="tossface" style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
-            전화 오지 않아요 · 카톡으로만 · 외부 제공 X
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: '#F8F9FA',
+              border: '1px solid #F3F4F6',
+              borderRadius: 100, padding: '8px 14px',
+              fontSize: 12, fontWeight: 600, color: '#4B5563',
+            }}>
+              <span className="tossface" style={{ fontSize: 13, lineHeight: 1 }}>🔒</span>
+              전화 오지 않아요 · 오직 카톡으로만 · 외부 제공 X
+            </div>
           </div>
         </div>
       </div>
