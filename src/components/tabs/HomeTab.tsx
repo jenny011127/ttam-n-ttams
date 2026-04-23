@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { Search, ChevronRight, Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket, Shield, FileText, ThumbsUp, ClipboardList } from 'lucide-react';
-import { colors, fontSize, fontWeight, radius, spacing, shadows } from '@/lib/design-tokens';
+import { Search, ChevronRight, Heart, Truck, Sparkles, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket, Shield, FileText, ThumbsUp, ClipboardList } from 'lucide-react';
+import { colors, fontSize, fontWeight, radius, shadows } from '@/lib/design-tokens';
 import { trackEvent } from '@/lib/track';
 import { categories } from '@/lib/categories';
 import { getTopAcademies, allReviews, getGovernmentFundedAcademies } from '@/lib/data';
@@ -12,7 +12,7 @@ import AcademyCard from '@/components/shared/AcademyCard';
 import StarRating from '@/components/shared/StarRating';
 
 const iconMap: Record<string, React.ElementType> = {
-  Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket,
+  Heart, Truck, Sparkles, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket,
 };
 
 export default function HomeTab({

@@ -5,9 +5,9 @@ import { supabase } from '@/lib/supabase';
 import { categories } from '@/lib/categories';
 import { colors, fontSize, fontWeight, radius, shadows } from '@/lib/design-tokens';
 import {
-  Users, TrendingUp, BarChart3, Filter,
-  ChevronDown, RefreshCw, MapPin, FileText,
-  ArrowRight, Eye, MousePointer,
+  Users, TrendingUp, BarChart3,
+  ChevronDown, RefreshCw, MapPin,
+  ArrowRight,
 } from 'lucide-react';
 
 // ─── Types ───
@@ -30,11 +30,6 @@ interface FunnelData {
   testStart: number;
   testComplete: number;
   leadSubmit: number;
-}
-
-interface EventRow {
-  event_type: string;
-  count: number;
 }
 
 // ─── Helpers ───

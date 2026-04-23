@@ -1,6 +1,6 @@
 'use client';
 
-import { BadgeCheck, Briefcase, Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket } from 'lucide-react';
+import { BadgeCheck, Briefcase, Heart, Truck, Sparkles, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import StarRating from './StarRating';
 import type { Academy } from '@/types';
@@ -17,7 +17,6 @@ const categoryTheme: Record<string, { color: string; Icon: typeof Heart }> = {
   'painting': { color: '#D946EF', Icon: PaintBucket },
   'care-worker': { color: '#FF6B6B', Icon: Heart },
   'beauty-nail': { color: '#EC4899', Icon: Sparkles },
-  'pilates-yoga': { color: '#10B981', Icon: Dumbbell },
 };
 
 function Thumbnail({ src, categoryId, size }: { src: string; categoryId: string; size: { w: number; h: number } }) {

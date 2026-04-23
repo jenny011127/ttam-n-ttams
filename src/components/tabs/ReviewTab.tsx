@@ -17,11 +17,8 @@ export default function ReviewTab() {
   if (selectedCategory) {
     const categoryAcademyPrefix = {
       'care-worker': 'cw-',
-      'korean-cooking': 'kc-',
       'forklift': 'fl-',
-      'baking': 'bk-',
       'beauty-nail': 'bn-',
-      'pilates-yoga': 'py-',
       'welding': 'wl-',
       'electrician': 'el-',
     }[selectedCategory];

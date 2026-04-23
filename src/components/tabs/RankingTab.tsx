@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket, Trophy, ChevronRight, TrendingUp, BarChart3, Star } from 'lucide-react';
+import { Heart, Truck, Sparkles, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket, ChevronRight, TrendingUp, BarChart3, Star } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { categories } from '@/lib/categories';
 import { getAcademiesByCategory } from '@/lib/data';
 import StarRating from '@/components/shared/StarRating';
 
 const iconMap: Record<string, React.ElementType> = {
-  Heart, Truck, Sparkles, Dumbbell, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket,
+  Heart, Truck, Sparkles, Flame, Zap, Wrench, LayoutGrid, Paintbrush, Snowflake, Droplets, PaintBucket,
 };
 
 type RankSort = 'passRate' | 'rating' | 'review';

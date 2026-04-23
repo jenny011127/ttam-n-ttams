@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   ChevronLeft, Share2, Heart, BadgeCheck, MapPin, Phone, Clock,
-  Users, TrendingUp, Star, GraduationCap, Briefcase, Shield,
-  ChevronRight, Calendar, BookOpen
+  Users, Star, GraduationCap, Briefcase, Shield,
+  Calendar, BookOpen
 } from 'lucide-react';
-import { colors, fontSize, fontWeight, radius, spacing, shadows } from '@/lib/design-tokens';
+import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { getAcademyById, getCoursesByAcademy, getReviewsByAcademy } from '@/lib/data';
 import { categories } from '@/lib/categories';
 import StarRating from '@/components/shared/StarRating';
@@ -192,7 +192,7 @@ export default function AcademyDetailPage() {
           <InfoSection academy={academy} />
         )}
         {activeTab === 'courses' && (
-          <CoursesSection courses={courses} isGovernmentFunded={academy.isGovernmentFunded} />
+          <CoursesSection courses={courses} />
         )}
         {activeTab === 'reviews' && (
           <ReviewsSection reviews={reviews} avgRating={academy.avgRating} avgSubRating={avgSubRating} />
@@ -311,7 +311,7 @@ function InfoSection({ academy }: { academy: ReturnType<typeof getAcademyById> }
 }
 
 // ─── Courses Section ───
-function CoursesSection({ courses, isGovernmentFunded }: { courses: Course[]; isGovernmentFunded: boolean }) {
+function CoursesSection({ courses }: { courses: Course[] }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {courses.map((course) => (

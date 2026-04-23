@@ -3,14 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   ChevronLeft, Search, X, ChevronDown,
-  Heart, ChefHat, Truck, Cake, Sparkles, Dumbbell, Flame, Zap,
+  Heart, Truck, Sparkles, Flame, Zap,
 } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { categories } from '@/lib/categories';
 import { allAcademies, allCourses } from '@/lib/data';
 
 const iconMap: Record<string, React.ElementType> = {
-  Heart, ChefHat, Truck, Cake, Sparkles, Dumbbell, Flame, Zap,
+  Heart, Truck, Sparkles, Flame, Zap,
 };
 
 // 검색 가능한 키워드 목록 (자동완성용)
