@@ -192,12 +192,8 @@ function LandingContent() {
   const heroCtaRef = useRef<HTMLDivElement>(null);
   const [showSticky, setShowSticky] = useState(false);
 
-  // 스플래시 + 회원가입
+  // 스플래시
   const [splashReady, setSplashReady] = useState(false);
-  const [signupId, setSignupId] = useState('');
-  const [signupPw, setSignupPw] = useState('');
-  const [signupError, setSignupError] = useState('');
-  const [signupLoading, setSignupLoading] = useState(false);
 
   useEffect(() => {
     if (step !== 'splash') return;
@@ -903,30 +899,14 @@ function LandingContent() {
   // STEP: SPLASH → 회원가입
   // ════════════════════════════════════════
   if (step === 'splash') {
-    const handleSignup = async () => {
-      if (!signupId.trim()) { setSignupError('아이디를 입력해주세요'); return; }
-      if (signupId.trim().length < 4) { setSignupError('아이디는 4자 이상이어야 해요'); return; }
-      if (!signupPw.trim()) { setSignupError('비밀번호를 입력해주세요'); return; }
-      if (signupPw.trim().length < 6) { setSignupError('비밀번호는 6자 이상이어야 해요'); return; }
-      setSignupError('');
-      setSignupLoading(true);
-
-      try {
-        if (supabase) {
-          await supabase.from('leads').update({
-            login_id: signupId.trim(),
-          }).eq('phone', phone.trim()).eq('name', name.trim());
-        }
-      } catch (e) { console.error('Signup error:', e); }
-
-      trackEvent('lp_signup', { page: '/landing' });
-      setSignupLoading(false);
+    const handleEnterApp = () => {
+      trackEvent('lp_signup', { page: '/landing', eventData: { skip: true } });
       router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`);
     };
 
     return (
       <div className="lp-page" style={{
-        background: `linear-gradient(180deg, #5974A8 0%, #78A2CC 60%, #A5D1E6 100%)`,
+        background: `linear-gradient(180deg, #2196F3 0%, #42A5F5 60%, #90CAF9 100%)`,
         color: '#fff',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
@@ -960,7 +940,7 @@ function LandingContent() {
           </p>
         </div>
 
-        {/* 2초 후 회원가입 폼 등장 */}
+        {/* 2초 후 다음 단계 안내 등장 */}
         {splashReady && (
           <div style={{
             animation: 'splashSlideUp 0.5s ease-out',
@@ -968,111 +948,52 @@ function LandingContent() {
           }}>
             <div style={{
               background: 'rgba(255,255,255,0.97)',
-              borderRadius: 20, padding: '26px 22px',
-              boxShadow: '0 12px 40px rgba(32,65,126,0.25)',
+              borderRadius: 20, padding: '28px 24px',
+              boxShadow: '0 12px 40px rgba(13,71,161,0.25)',
             }}>
               <h2 style={{ fontSize: 19, fontWeight: 800, marginBottom: 6, textAlign: 'center', color: '#141517' }}>
-                첫걸음, 같이 시작해요
+                이제 뭘 하면 되냐면요
               </h2>
-              <p style={{ fontSize: 13, color: '#727883', marginBottom: 18, textAlign: 'center', lineHeight: 1.55 }}>
-                가입만 하시면, 다음 단계부터는<br />
-                저희가 차근차근 안내해드릴게요.
+              <p style={{ fontSize: 13, color: '#727883', marginBottom: 20, textAlign: 'center', lineHeight: 1.55 }}>
+                복잡한 건 저희가,<br />
+                <b style={{ color: '#141517' }}>{name || '회원'}님은 학원 구경만 하시면 돼요.</b>
               </p>
 
               {/* 약속 체크리스트 */}
               <div style={{
                 background: '#F8F9FA',
-                borderRadius: 12, padding: '14px 14px',
-                marginBottom: 18,
+                borderRadius: 12, padding: '16px 16px',
+                marginBottom: 20,
               }}>
                 {[
-                  { emoji: '💳', text: '내일배움카드 신청 방법' },
-                  { emoji: '🏫', text: '나에게 맞는 학원 매칭' },
-                  { emoji: '💬', text: '수강신청까지 카톡 상담' },
-                ].map((item, i) => (
+                  { emoji: '🏫', text: '나에게 맞는 학원 보기', sub: '지금 바로' },
+                  { emoji: '💳', text: '내일배움카드 신청 가이드', sub: '카톡으로 전송' },
+                  { emoji: '💬', text: '수강신청까지 1:1 상담', sub: '막히면 언제든' },
+                ].map((item, i, arr) => (
                   <div key={i} style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '5px 0',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 0',
+                    borderBottom: i < arr.length - 1 ? '1px dashed #E5E7EB' : 'none',
                   }}>
-                    <span className="tossface" style={{ fontSize: 16, lineHeight: 1 }}>{item.emoji}</span>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#141517' }}>{item.text}</span>
+                    <span className="tossface" style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>{item.emoji}</span>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#141517', lineHeight: 1.3, marginBottom: 2 }}>{item.text}</p>
+                      <p style={{ fontSize: 11, color: colors['orange-40'], fontWeight: 600 }}>{item.sub}</p>
+                    </div>
                   </div>
                 ))}
               </div>
 
-              {/* 이름/전화번호 (이미 입력됨) */}
-              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-                <div style={{
-                  flex: 1, padding: '11px 14px',
-                  background: '#F8F9FA', borderRadius: 10,
-                  border: '1px solid #F3F4F6',
-                  fontSize: 13, color: '#727883',
-                }}>
-                  {name || '이름'}
-                </div>
-                <div style={{
-                  flex: 1, padding: '11px 14px',
-                  background: '#F8F9FA', borderRadius: 10,
-                  border: '1px solid #F3F4F6',
-                  fontSize: 13, color: '#727883',
-                }}>
-                  {phone || '전화번호'}
-                </div>
-              </div>
-
-              {/* 아이디 */}
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
-                background: '#F8F9FA', borderRadius: 10,
-                border: '1px solid #F3F4F6', marginBottom: 10,
-              }}>
-                <User size={16} color="#B2B8C0" />
-                <input type="text" placeholder="아이디 (4자 이상)" value={signupId}
-                  onChange={e => setSignupId(e.target.value)}
-                  style={{
-                    flex: 1, border: 'none', background: 'transparent',
-                    fontSize: 15, color: '#141517', outline: 'none',
-                  }} />
-              </div>
-
-              {/* 비밀번호 */}
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 10, padding: '13px 14px',
-                background: '#F8F9FA', borderRadius: 10,
-                border: '1px solid #F3F4F6', marginBottom: 16,
-              }}>
-                <Check size={16} color="#B2B8C0" />
-                <input type="password" placeholder="비밀번호 (6자 이상)" value={signupPw}
-                  onChange={e => setSignupPw(e.target.value)}
-                  style={{
-                    flex: 1, border: 'none', background: 'transparent',
-                    fontSize: 15, color: '#141517', outline: 'none',
-                  }} />
-              </div>
-
-              {signupError && (
-                <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12, textAlign: 'center' }}>{signupError}</p>
-              )}
-
-              <button onClick={handleSignup} disabled={signupLoading} className="press" style={{
+              <button onClick={handleEnterApp} className="press" style={{
                 width: '100%', padding: '15px 0', borderRadius: 12, border: 'none',
-                background: signupLoading ? '#B2B8C0' : colors['orange-40'],
+                background: colors['orange-40'],
                 fontSize: 16, fontWeight: 700,
                 color: '#fff',
-                cursor: signupLoading ? 'default' : 'pointer',
+                cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 boxShadow: `0 6px 20px ${colors['orange-40']}40`,
               }}>
-                {signupLoading ? '가입 중...' : <>가입하고 안내 받기 <ArrowRight size={16} /></>}
-              </button>
-
-              <button onClick={() => router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`)}
-                style={{
-                  width: '100%', padding: '12px 0', marginTop: 10,
-                  background: 'none', border: 'none',
-                  fontSize: 13, color: '#727883', cursor: 'pointer',
-                }}>
-                먼저 학원부터 둘러보기 →
+                내 학원 보러 가기 <ArrowRight size={16} />
               </button>
             </div>
           </div>
