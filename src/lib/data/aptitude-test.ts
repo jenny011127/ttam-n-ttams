@@ -66,6 +66,7 @@ export const questions: TestQuestion[] = [
       { id: 'student', label: '학생 (재학/졸업예정)' },
       { id: 'jobseeker', label: '취업 준비 중' },
       { id: 'career-change', label: '이직/전직 준비' },
+      { id: 'on-leave', label: '휴직 중 (육아·병가 등)' },
       { id: 'employed', label: '재직 중 (자격증 추가)' },
     ],
   },
@@ -149,7 +150,7 @@ interface CertProfile {
   salaryFit: { '200': number; '300': number; '400': number; '500': number };
   workstyleFit: { 'hands-on': number; service: number; creative: number; technical: number };
   goalFit: { stable: number; money: number; startup: number; skill: number };
-  statusFit: { student: number; jobseeker: number; 'career-change': number; employed: number };
+  statusFit: { student: number; jobseeker: number; 'career-change': number; 'on-leave': number; employed: number };
 }
 
 const certProfiles: CertProfile[] = [
@@ -168,7 +169,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 2, '300': 5, '400': 8, '500': 10 },
     workstyleFit: { 'hands-on': 10, service: 0, creative: 3, technical: 7 },
     goalFit: { stable: 5, money: 10, startup: 4, skill: 8 },
-    statusFit: { student: 7, jobseeker: 9, 'career-change': 8, employed: 4 },
+    statusFit: { student: 7, jobseeker: 9, 'career-change': 8, 'on-leave': 8, employed: 4 },
   },
   {
     categoryId: 'plumbing',
@@ -185,7 +186,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 3, '300': 6, '400': 8, '500': 9 },
     workstyleFit: { 'hands-on': 10, service: 0, creative: 2, technical: 7 },
     goalFit: { stable: 7, money: 8, startup: 5, skill: 7 },
-    statusFit: { student: 6, jobseeker: 8, 'career-change': 9, employed: 5 },
+    statusFit: { student: 6, jobseeker: 8, 'career-change': 9, 'on-leave': 9, employed: 5 },
   },
   {
     categoryId: 'electrician',
@@ -202,7 +203,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 4, '300': 7, '400': 8, '500': 6 },
     workstyleFit: { 'hands-on': 7, service: 1, creative: 3, technical: 10 },
     goalFit: { stable: 9, money: 6, startup: 4, skill: 9 },
-    statusFit: { student: 8, jobseeker: 9, 'career-change': 7, employed: 6 },
+    statusFit: { student: 8, jobseeker: 9, 'career-change': 7, 'on-leave': 7, employed: 6 },
   },
   {
     categoryId: 'tiling',
@@ -219,7 +220,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 3, '300': 6, '400': 8, '500': 7 },
     workstyleFit: { 'hands-on': 8, service: 1, creative: 8, technical: 5 },
     goalFit: { stable: 5, money: 7, startup: 9, skill: 8 },
-    statusFit: { student: 5, jobseeker: 8, 'career-change': 10, employed: 4 },
+    statusFit: { student: 5, jobseeker: 8, 'career-change': 10, 'on-leave': 10, employed: 4 },
   },
   {
     categoryId: 'wallpaper',
@@ -236,7 +237,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 4, '300': 7, '400': 8, '500': 5 },
     workstyleFit: { 'hands-on': 7, service: 2, creative: 8, technical: 4 },
     goalFit: { stable: 4, money: 6, startup: 10, skill: 7 },
-    statusFit: { student: 4, jobseeker: 7, 'career-change': 10, employed: 4 },
+    statusFit: { student: 4, jobseeker: 7, 'career-change': 10, 'on-leave': 10, employed: 4 },
   },
   {
     categoryId: 'hvac',
@@ -253,7 +254,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 3, '300': 6, '400': 8, '500': 7 },
     workstyleFit: { 'hands-on': 8, service: 3, creative: 2, technical: 9 },
     goalFit: { stable: 6, money: 8, startup: 6, skill: 8 },
-    statusFit: { student: 6, jobseeker: 8, 'career-change': 8, employed: 5 },
+    statusFit: { student: 6, jobseeker: 8, 'career-change': 8, 'on-leave': 8, employed: 5 },
   },
   {
     categoryId: 'forklift',
@@ -270,7 +271,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 7, '300': 8, '400': 5, '500': 2 },
     workstyleFit: { 'hands-on': 9, service: 1, creative: 0, technical: 5 },
     goalFit: { stable: 10, money: 4, startup: 2, skill: 5 },
-    statusFit: { student: 5, jobseeker: 10, 'career-change': 8, employed: 4 },
+    statusFit: { student: 5, jobseeker: 10, 'career-change': 8, 'on-leave': 8, employed: 4 },
   },
   {
     categoryId: 'waterproof',
@@ -287,7 +288,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 4, '300': 7, '400': 7, '500': 5 },
     workstyleFit: { 'hands-on': 10, service: 0, creative: 2, technical: 5 },
     goalFit: { stable: 6, money: 7, startup: 5, skill: 7 },
-    statusFit: { student: 4, jobseeker: 8, 'career-change': 9, employed: 4 },
+    statusFit: { student: 4, jobseeker: 8, 'career-change': 9, 'on-leave': 9, employed: 4 },
   },
   {
     categoryId: 'painting',
@@ -304,7 +305,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 5, '300': 7, '400': 6, '500': 4 },
     workstyleFit: { 'hands-on': 7, service: 1, creative: 7, technical: 5 },
     goalFit: { stable: 6, money: 5, startup: 6, skill: 7 },
-    statusFit: { student: 5, jobseeker: 8, 'career-change': 8, employed: 4 },
+    statusFit: { student: 5, jobseeker: 8, 'career-change': 8, 'on-leave': 8, employed: 4 },
   },
   {
     categoryId: 'care-worker',
@@ -321,7 +322,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 10, '300': 6, '400': 2, '500': 0 },
     workstyleFit: { 'hands-on': 3, service: 10, creative: 0, technical: 2 },
     goalFit: { stable: 10, money: 1, startup: 2, skill: 5 },
-    statusFit: { student: 3, jobseeker: 7, 'career-change': 9, employed: 5 },
+    statusFit: { student: 3, jobseeker: 7, 'career-change': 9, 'on-leave': 9, employed: 5 },
   },
   {
     categoryId: 'beauty-nail',
@@ -338,7 +339,7 @@ const certProfiles: CertProfile[] = [
     salaryFit: { '200': 6, '300': 8, '400': 6, '500': 3 },
     workstyleFit: { 'hands-on': 2, service: 7, creative: 10, technical: 3 },
     goalFit: { stable: 4, money: 5, startup: 10, skill: 7 },
-    statusFit: { student: 8, jobseeker: 8, 'career-change': 7, employed: 4 },
+    statusFit: { student: 8, jobseeker: 8, 'career-change': 7, 'on-leave': 7, employed: 4 },
   },
 ];
 

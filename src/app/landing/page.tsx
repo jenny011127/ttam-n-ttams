@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  ArrowLeft, ChevronRight, Trophy, Medal, Award, MapPin,
+  ArrowLeft, ChevronRight, MapPin,
   Check, User, Phone, Sparkles, ArrowRight,
 } from 'lucide-react';
 import { colors } from '@/lib/design-tokens';
@@ -1051,7 +1051,7 @@ function LandingContent() {
   // ════════════════════════════════════════
   // STEP: RESULT — 바로 결과 공개
   // ════════════════════════════════════════
-  const rankIcons = [Trophy, Medal, Award];
+  const rankEmojis = ['🥇', '🥈', '🥉'];
   const rankColors = [colors['orange-40'], '#6B7280', '#CD7F32'];
   const rankLabels = ['최고 적합', '추천', '추천'];
 
@@ -1065,7 +1065,7 @@ function LandingContent() {
       }}>
         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 8 }}>당신에게 가장 잘 맞는 자격증은</p>
         <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}>
-          <Trophy size={48} color="#fff" strokeWidth={1.5} />
+          <span className="tossface" style={{ fontSize: 56, lineHeight: 1 }}>🏆</span>
         </div>
         <h1 className="lp-result-name" style={{ fontWeight: 900, letterSpacing: -0.5, marginBottom: 8, color: '#fff' }}>
           {top3[0]?.name}
@@ -1091,7 +1091,6 @@ function LandingContent() {
         {top3.map((result, idx) => {
           const copy = resultCopy[result.categoryId];
           const cat = categories.find(c => c.id === result.categoryId);
-          const RankIcon = rankIcons[idx];
           const academies = getFilteredAcademies(result.categoryId);
           const isSelected = selectedIdx === idx;
 
@@ -1105,10 +1104,11 @@ function LandingContent() {
               }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
                 <div style={{
-                  width: 36, height: 36, borderRadius: 10,
+                  width: 42, height: 42, borderRadius: 12,
                   background: `${rankColors[idx]}12`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
                 }}>
-                  <RankIcon size={20} color={rankColors[idx]} />
+                  <span className="tossface" style={{ fontSize: 24, lineHeight: 1 }}>{rankEmojis[idx]}</span>
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1132,7 +1132,7 @@ function LandingContent() {
                 <div style={{ marginBottom: 14 }}>
                   {copy.detailPoints.map((point, i) => (
                     <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 4 }}>
-                      <Check size={14} color="#22C55E" style={{ marginTop: 2, flexShrink: 0 }} />
+                      <span className="tossface" style={{ fontSize: 14, lineHeight: 1.3, flexShrink: 0, marginTop: 1 }}>✅</span>
                       <span style={{ fontSize: 13, color: '#4B5563', lineHeight: 1.4 }}>{point}</span>
                     </div>
                   ))}
@@ -1151,8 +1151,8 @@ function LandingContent() {
 
               {academies.length > 0 && (
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                    <MapPin size={13} color={colors['orange-40']} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <span className="tossface" style={{ fontSize: 14, lineHeight: 1 }}>📍</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color: '#141517' }}>
                       {regionKeys.length > 0 ? `${regionKeys[0]} 지역` : '전국'} 추천 학원
                     </span>
