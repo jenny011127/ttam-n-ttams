@@ -26,10 +26,12 @@ interface Lead {
 }
 
 interface FunnelData {
-  visit: number;
-  testStart: number;
-  testComplete: number;
-  leadSubmit: number;
+  landingView: number;     // lp_view
+  testStart: number;       // lp_test_start
+  testComplete: number;    // lp_test_complete
+  collectSubmit: number;   // lp_collect_submit
+  resultNextClick: number; // lp_result_next_click
+  appEntry: number;        // lp_academy_cta_click
 }
 
 // ─── Helpers ───
@@ -95,10 +97,12 @@ function StatCard({ icon: Icon, label, value, sub, color }: {
 // ─── Funnel Bar ───
 function FunnelBar({ funnel }: { funnel: FunnelData }) {
   const steps = [
-    { label: '방문', value: funnel.visit, color: colors['gray-60'] },
-    { label: '테스트 시작', value: funnel.testStart, color: '#3B82F6' },
+    { label: '랜딩 진입', value: funnel.landingView, color: colors['gray-60'] },
+    { label: '진단 시작', value: funnel.testStart, color: '#3B82F6' },
     { label: '테스트 완료', value: funnel.testComplete, color: '#F59E0B' },
-    { label: '정보 입력', value: funnel.leadSubmit, color: colors['orange-40'] },
+    { label: '이름·전화 입력', value: funnel.collectSubmit, color: '#EC4899' },
+    { label: '결과→가이드 클릭', value: funnel.resultNextClick, color: '#8B5CF6' },
+    { label: '앱 진입', value: funnel.appEntry, color: colors['orange-40'] },
   ];
   const max = Math.max(...steps.map((s) => s.value), 1);
 
@@ -155,7 +159,10 @@ function FunnelBar({ funnel }: { funnel: FunnelData }) {
 // ─── Main Admin Page ───
 export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [funnel, setFunnel] = useState<FunnelData>({ visit: 0, testStart: 0, testComplete: 0, leadSubmit: 0 });
+  const [funnel, setFunnel] = useState<FunnelData>({
+    landingView: 0, testStart: 0, testComplete: 0,
+    collectSubmit: 0, resultNextClick: 0, appEntry: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -186,15 +193,16 @@ export default function AdminPage() {
           counts[e.event_type] = (counts[e.event_type] || 0) + 1;
         });
         setFunnel({
-          visit: counts['page_view'] || 0,
-          testStart: counts['test_start'] || 0,
-          testComplete: counts['test_complete'] || 0,
-          leadSubmit: leadsData?.length || 0,
+          landingView: counts['lp_view'] || 0,
+          testStart: counts['lp_test_start'] || 0,
+          testComplete: counts['lp_test_complete'] || 0,
+          collectSubmit: counts['lp_collect_submit'] || 0,
+          resultNextClick: counts['lp_result_next_click'] || 0,
+          appEntry: counts['lp_academy_cta_click'] || 0,
         });
       }
     } catch {
       // events table not yet created
-      setFunnel((prev) => ({ ...prev, leadSubmit: leadsData?.length || 0 }));
     }
 
     setLoading(false);
@@ -290,9 +298,9 @@ export default function AdminPage() {
         {/* ─── Summary Cards ─── */}
         <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
           <StatCard icon={Users} label="총 리드" value={leads.length} sub={`이번 주 +${thisWeekLeads.length}`} color="#3B82F6" />
-          <StatCard icon={TrendingUp} label="전환율" value={
-            funnel.visit > 0 ? `${Math.round((leads.length / funnel.visit) * 100)}%` : '-'
-          } sub="방문 → 리드" color="#10B981" />
+          <StatCard icon={TrendingUp} label="최종 전환율" value={
+            funnel.landingView > 0 ? `${Math.round((funnel.appEntry / funnel.landingView) * 100)}%` : '-'
+          } sub="랜딩 진입 → 앱 진입" color="#10B981" />
           <StatCard icon={BarChart3} label="인기 자격증" value={
             categoryStats[0]?.count > 0 ? categoryStats[0].name : '-'
           } sub={categoryStats[0]?.count > 0 ? `${categoryStats[0].count}건` : ''} color={colors['orange-40']} />
