@@ -2,18 +2,17 @@ import { supabase } from './supabase';
 
 declare global {
   interface Window {
-    gtag?: (
-      command: 'event',
-      eventName: string,
-      params?: Record<string, unknown>
-    ) => void;
+    dataLayer?: unknown[];
   }
 }
 
 /**
  * 이벤트를 Supabase events 테이블 + GA4로 동시 기록
  * - Supabase: 어드민 대시보드·리드 관리용 (자체 DB)
- * - GA4: 광고 채널·UTM별 전환 분석용 (GTM 경유 Google 태그가 전송)
+ * - GA4: 광고 채널·UTM별 전환 분석용 (GTM 경유)
+ *
+ * GA4 전송은 window.dataLayer에 직접 푸시하는 방식.
+ * gtag 전역보다 먼저 준비되므로, GTM이 늦게 로드돼도 큐에 쌓였다가 처리됨.
  */
 export function trackEvent(
   eventType: string,
@@ -39,8 +38,9 @@ export function trackEvent(
     }).then(); // fire-and-forget
   }
 
-  // GA4 — GTM이 로드한 Google 태그의 gtag 전역 사용
-  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', eventType, data?.eventData || {});
+  // GA4 via dataLayer (gtag('event', ...) 와 동일 — dataLayer에 직접 푸시하면 GTM이 처리)
+  if (typeof window !== 'undefined') {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(['event', eventType, data?.eventData || {}]);
   }
 }
