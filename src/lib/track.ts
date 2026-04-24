@@ -2,47 +2,23 @@ import { supabase } from './supabase';
 
 declare global {
   interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
+    dataLayer?: Record<string, unknown>[];
   }
 }
 
 /**
- * GA4로 이벤트 전송. gtag가 아직 로드 전이면 최대 5초까지 폴링하며 재시도.
- * window.location.search에 debug=1 있으면 콘솔 로그로 상태 출력.
+ * GTM dataLayer로 이벤트 푸시. GTM의 맞춤 이벤트 트리거가 이걸 받아 GA4로 전달.
+ * (gtag가 아니라 dataLayer 사용 — GTM 경유 환경에서 gtag는 window에 노출되지 않음)
  */
-function sendToGA4(eventType: string, eventData?: Record<string, unknown>) {
+function pushToDataLayer(eventType: string, eventData?: Record<string, unknown>) {
   if (typeof window === 'undefined') return;
 
-  const debug = window.location.search.includes('debug=1');
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: eventType, ...(eventData || {}) });
 
-  const send = (): boolean => {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', eventType, eventData || {});
-      if (debug) console.log('[trackEvent→GA4] sent', eventType, eventData);
-      return true;
-    }
-    return false;
-  };
-
-  if (send()) return;
-
-  if (debug) {
-    console.warn('[trackEvent→GA4] gtag not ready, polling...', eventType, {
-      dataLayerLen: window.dataLayer?.length,
-      gtagType: typeof window.gtag,
-    });
+  if (window.location.search.includes('debug=1')) {
+    console.log('[trackEvent→GTM]', eventType, eventData);
   }
-
-  let retries = 0;
-  const interval = setInterval(() => {
-    if (send() || ++retries >= 50) {
-      if (retries >= 50 && debug) {
-        console.error('[trackEvent→GA4] gtag never loaded after 5s, event lost:', eventType);
-      }
-      clearInterval(interval);
-    }
-  }, 100);
 }
 
 /**
@@ -72,6 +48,6 @@ export function trackEvent(
     }).then(); // fire-and-forget
   }
 
-  // GA4
-  sendToGA4(eventType, data?.eventData);
+  // GA4 (via GTM)
+  pushToDataLayer(eventType, data?.eventData);
 }
