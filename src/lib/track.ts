@@ -2,17 +2,51 @@ import { supabase } from './supabase';
 
 declare global {
   interface Window {
-    dataLayer?: IArguments[] | unknown[];
+    dataLayer?: unknown[];
     gtag?: (...args: unknown[]) => void;
   }
 }
 
 /**
- * 이벤트를 Supabase + GA4(via GTM Google Tag) 에 기록.
- *
- * GA4 전송은 gtag 전역 함수를 사용.
- * - window.gtag가 없으면 직접 shim을 생성해 dataLayer에 arguments를 푸시 (gtag.js canonical pattern)
- * - 이렇게 하면 GTM이 늦게 로드돼도 gtag.js가 dataLayer를 처리하면서 이벤트가 GA4로 전송됨
+ * GA4로 이벤트 전송. gtag가 아직 로드 전이면 최대 5초까지 폴링하며 재시도.
+ * window.location.search에 debug=1 있으면 콘솔 로그로 상태 출력.
+ */
+function sendToGA4(eventType: string, eventData?: Record<string, unknown>) {
+  if (typeof window === 'undefined') return;
+
+  const debug = window.location.search.includes('debug=1');
+
+  const send = (): boolean => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventType, eventData || {});
+      if (debug) console.log('[trackEvent→GA4] sent', eventType, eventData);
+      return true;
+    }
+    return false;
+  };
+
+  if (send()) return;
+
+  if (debug) {
+    console.warn('[trackEvent→GA4] gtag not ready, polling...', eventType, {
+      dataLayerLen: window.dataLayer?.length,
+      gtagType: typeof window.gtag,
+    });
+  }
+
+  let retries = 0;
+  const interval = setInterval(() => {
+    if (send() || ++retries >= 50) {
+      if (retries >= 50 && debug) {
+        console.error('[trackEvent→GA4] gtag never loaded after 5s, event lost:', eventType);
+      }
+      clearInterval(interval);
+    }
+  }, 100);
+}
+
+/**
+ * 이벤트를 Supabase + GA4로 동시 기록.
  */
 export function trackEvent(
   eventType: string,
@@ -38,16 +72,6 @@ export function trackEvent(
     }).then(); // fire-and-forget
   }
 
-  // GA4 via gtag (canonical pattern — arguments 객체 사용)
-  if (typeof window !== 'undefined') {
-    window.dataLayer = window.dataLayer || [];
-    if (typeof window.gtag !== 'function') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      window.gtag = function gtag() {
-        // eslint-disable-next-line prefer-rest-params
-        (window.dataLayer as IArguments[]).push(arguments);
-      };
-    }
-    window.gtag('event', eventType, data?.eventData || {});
-  }
+  // GA4
+  sendToGA4(eventType, data?.eventData);
 }
