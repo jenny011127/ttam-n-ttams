@@ -5,6 +5,7 @@ import { Star, ThumbsUp, BadgeCheck } from 'lucide-react';
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { categories } from '@/lib/categories';
 import { allReviews, getAcademyById } from '@/lib/data';
+import { maskName } from '@/lib/mask';
 import StarRating from '@/components/shared/StarRating';
 import type { Review } from '@/types';
 
@@ -149,7 +150,7 @@ function ReviewCard({ review, academyName }: { review: Review; academyName?: str
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <span style={{ fontSize: fontSize.base, fontWeight: fontWeight.semibold, color: colors.black }}>
-                {review.authorName}
+                {maskName(review.authorName)}
               </span>
               {review.isVerified && (
                 <BadgeCheck size={14} color={colors.government} fill={colors.government} strokeWidth={0} />

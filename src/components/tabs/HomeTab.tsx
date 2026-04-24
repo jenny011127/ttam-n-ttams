@@ -8,6 +8,7 @@ import { trackEvent } from '@/lib/track';
 import { categories } from '@/lib/categories';
 import { getTopAcademies, allReviews, getGovernmentFundedAcademies } from '@/lib/data';
 import { getAvailableExamCategories } from '@/lib/data/mock-exams';
+import { maskName } from '@/lib/mask';
 import AcademyCard from '@/components/shared/AcademyCard';
 import StarRating from '@/components/shared/StarRating';
 
@@ -341,7 +342,7 @@ export default function HomeTab({
                   )}
                 </div>
                 <span style={{ fontSize: fontSize.xs, color: colors['gray-60'] }}>
-                  {review.authorName} · {review.authorAgeGroup}
+                  {maskName(review.authorName)} · {review.authorAgeGroup}
                 </span>
               </div>
               <h4 style={{ fontSize: fontSize.base, fontWeight: fontWeight.semibold, color: colors.black, marginBottom: 4 }}>

@@ -10,6 +10,7 @@ import {
 import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 import { getAcademyById, getCoursesByAcademy, getReviewsByAcademy } from '@/lib/data';
 import { categories } from '@/lib/categories';
+import { maskName } from '@/lib/mask';
 import StarRating from '@/components/shared/StarRating';
 import type { Course, Review } from '@/types';
 
@@ -418,7 +419,7 @@ function ReviewsSection({ reviews, avgRating, avgSubRating }: { reviews: Review[
           <div key={review.id} style={{ paddingBottom: 16, borderBottom: `1px solid ${colors['gray-10']}` }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: fontSize.base, fontWeight: fontWeight.semibold }}>{review.authorName}</span>
+                <span style={{ fontSize: fontSize.base, fontWeight: fontWeight.semibold }}>{maskName(review.authorName)}</span>
                 <span style={{ fontSize: fontSize.xs, color: colors['gray-60'] }}>{review.authorAgeGroup}</span>
                 {review.passed && (
                   <span style={{ fontSize: 10, fontWeight: fontWeight.bold, color: colors.success, background: '#ECFDF5', padding: '1px 6px', borderRadius: 4 }}>합격</span>
