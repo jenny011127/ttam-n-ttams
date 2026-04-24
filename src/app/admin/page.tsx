@@ -274,7 +274,7 @@ export default function AdminPage() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       }}>
         <div>
-          <h1 style={{ fontSize: fontSize['2xl'], fontWeight: fontWeight.extrabold, marginBottom: 4 }}>
+          <h1 style={{ fontSize: fontSize['2xl'], fontWeight: fontWeight.extrabold, marginBottom: 4, fontFamily: "'JalnanGothic', sans-serif" }}>
             땀앤땀스 Admin
           </h1>
           <p style={{ fontSize: fontSize.sm, color: 'rgba(255,255,255,0.6)' }}>

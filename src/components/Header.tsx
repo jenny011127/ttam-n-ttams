@@ -18,7 +18,7 @@ export default function Header() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ fontSize: fontSize['2xl'], fontWeight: fontWeight.extrabold, color: colors['orange-40'], fontFamily: "'memomentKkukKkuk', sans-serif" }}>
+        <span style={{ fontSize: fontSize['2xl'], fontWeight: fontWeight.extrabold, color: colors['orange-40'], fontFamily: "'JalnanGothic', sans-serif" }}>
           땀앤땀스
         </span>
       </div>

@@ -63,7 +63,7 @@ export default function SplashScreen({ onFinish }: { onFinish: () => void }) {
           color: colors.white,
           letterSpacing: -0.5,
           marginBottom: 8,
-          fontFamily: "'memomentKkukKkuk', sans-serif",
+          fontFamily: "'JalnanGothic', sans-serif",
         }}
       >
         땀앤땀스

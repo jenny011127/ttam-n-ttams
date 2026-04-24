@@ -643,7 +643,7 @@ function LandingContent() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 32 }}>
               <div>
-                <p style={{ color: '#fff', fontWeight: 700, fontSize: 16, marginBottom: 8 }}>땀앤땀스</p>
+                <p style={{ color: '#fff', fontWeight: 700, fontSize: 16, marginBottom: 8, fontFamily: "'JalnanGothic', sans-serif" }}>땀앤땀스</p>
                 <p>자격증 학원 비교 플랫폼</p>
               </div>
               <div style={{ display: 'flex', gap: 40 }}>
