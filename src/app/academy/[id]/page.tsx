@@ -28,6 +28,15 @@ export default function AcademyDetailPage() {
   const reviews = academy ? getReviewsByAcademy(academy.id) : [];
   const category = categories.find((c) => c.id === academy?.categoryId);
 
+  // 뒤로가기: 히스토리 있으면 이전 화면, 없으면(직접 링크 진입) 홈
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push('/');
+    }
+  };
+
   if (!academy) {
     return (
       <div className="app-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
@@ -85,7 +94,7 @@ export default function AcademyDetailPage() {
           zIndex: 50,
         }}
       >
-        <button onClick={() => router.back()} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+        <button onClick={handleBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
           <ChevronLeft size={24} color={colors.black} />
         </button>
         <button style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
@@ -209,8 +218,10 @@ export default function AcademyDetailPage() {
         style={{
           position: 'fixed',
           bottom: 0,
-          left: 0,
-          right: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: 430,
           background: colors.white,
           borderTop: `1px solid ${colors['gray-20']}`,
           padding: '12px 20px',
