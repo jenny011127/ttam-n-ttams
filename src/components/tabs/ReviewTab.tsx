@@ -15,16 +15,11 @@ export default function ReviewTab() {
   let filtered = [...allReviews];
 
   if (selectedCategory) {
-    const categoryAcademyPrefix = {
-      'care-worker': 'cw-',
-      'forklift': 'fl-',
-      'beauty-nail': 'bn-',
-      'welding': 'wl-',
-      'electrician': 'el-',
-    }[selectedCategory];
-    if (categoryAcademyPrefix) {
-      filtered = filtered.filter((r) => r.academyId.startsWith(categoryAcademyPrefix));
-    }
+    // academyId로 academy를 조회해서 categoryId 비교 (prefix 하드코딩 X)
+    filtered = filtered.filter((r) => {
+      const academy = getAcademyById(r.academyId);
+      return academy?.categoryId === selectedCategory;
+    });
   }
 
   filtered.sort((a, b) =>
