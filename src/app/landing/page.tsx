@@ -258,7 +258,11 @@ function LandingContent() {
       }
     } catch (e) { console.error('Lead save error:', e); }
 
-    trackEvent('lp_collect_submit', { page: '/landing', eventData: { region } });
+    const topCategoryId = calculateResults({ ...answers, region })[0]?.categoryId;
+    trackEvent('lp_collect_submit', {
+      page: '/landing',
+      eventData: { topCategoryId, region },
+    });
     setSaving(false);
     setStep('result');
     window.scrollTo(0, 0);
@@ -279,7 +283,11 @@ function LandingContent() {
       }, 200);
     } else {
       // 테스트 완료 → 결과 게이트 (이름/전화번호/지역)
-      trackEvent('lp_test_complete', { page: '/landing', eventData: { answers: newAnswers } });
+      const topCategoryId = calculateResults(newAnswers)[0]?.categoryId;
+      trackEvent('lp_test_complete', {
+        page: '/landing',
+        eventData: { topCategoryId, answers: newAnswers },
+      });
       setStep('collect');
       window.scrollTo(0, 0);
     }
@@ -900,7 +908,13 @@ function LandingContent() {
   // ════════════════════════════════════════
   if (step === 'splash') {
     const handleEnterApp = () => {
-      trackEvent('lp_signup', { page: '/landing', eventData: { skip: true } });
+      trackEvent('lp_academy_cta_click', {
+        page: '/landing',
+        eventData: {
+          topCategoryId: top3[0]?.categoryId,
+          region: userRegion,
+        },
+      });
       router.push(`/?tab=search&category=${top3[0]?.categoryId}&region=${userRegion}`);
     };
 
@@ -1142,14 +1156,24 @@ function LandingContent() {
         paddingBottom: 'calc(16px + env(safe-area-inset-bottom))',
         background: 'linear-gradient(transparent, #fff 20%)',
       }}>
-        <button onClick={() => { setStep('splash'); window.scrollTo(0, 0); }}
+        <button onClick={() => {
+          trackEvent('lp_result_next_click', {
+            page: '/landing',
+            eventData: {
+              topCategoryId: top3[0]?.categoryId,
+              region: userRegion,
+            },
+          });
+          setStep('splash');
+          window.scrollTo(0, 0);
+        }}
           className="press" style={{
             width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '16px 0', borderRadius: 14, border: 'none',
             background: colors['orange-40'], fontSize: 16, fontWeight: 700, color: '#fff',
             cursor: 'pointer',
           }}>
-          내 학원 보러 가기 <ArrowRight size={18} />
+          무료 수강 학원보기 <ArrowRight size={18} />
         </button>
       </div>
     </div>
